@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
   // This function is used to fetch all data from the database
   void _refreshDecks() async {
-    final data = await DatabaseHelper.getItems();
+    final data = await DatabaseHelper.getDictionaries();
     setState(() {
       _decks = data;
       _isLoading = false;
@@ -98,21 +98,18 @@ class _HomePageState extends State<HomePage> {
             ));
   }
 
-// Insert a new journal to the database
   Future<void> _addItem() async {
-    await DatabaseHelper.createItem(_nameController.text);
+    await DatabaseHelper.createDictionary(_nameController.text);
     _refreshDecks();
   }
 
-  // Update an existing journal
   Future<void> _updateItem(int id) async {
-    await DatabaseHelper.updateItem(id, _nameController.text);
+    await DatabaseHelper.updateDictionary(id, _nameController.text);
     _refreshDecks();
   }
 
-  // Delete an item
   void _deleteItem(int id) async {
-    await DatabaseHelper.deleteItem(id);
+    await DatabaseHelper.deleteDictionary(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Successfully deleted a deck!'),
     ));
@@ -156,8 +153,8 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => DeckDetail(
-                                  id: _decks[index]['id'],
-                                  name: _decks[index]['name'],
+                                  deckId: _decks[index]['id'],
+                                  deckName: _decks[index]['name'],
                                 )),
                       );
                     }),
