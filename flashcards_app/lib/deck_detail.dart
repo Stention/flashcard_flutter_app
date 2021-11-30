@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:convert' show utf8;
 import "database_helper.dart";
 import 'deck_games.dart';
 
@@ -105,6 +106,24 @@ class _DeckDetailState extends State<DeckDetail> {
     file.writeAsString(csv);
   }
 
+  void _uploadCsvFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    final inputCsvFile = File(directory.path + '/file.csv').openRead();
+
+    final words = await inputCsvFile
+        .transform(utf8.decoder)
+        .transform(const CsvToListConverter(fieldDelimiter: ";"))
+        .toList();
+
+    for (List wordPair in words) {
+      await DatabaseHelper.createWord(
+          widget.deckName, wordPair[0], wordPair[1]);
+    }
+
+    _refreshDecks();
+  }
+
   Future<void> _addWord() async {
     await DatabaseHelper.createWord(
         widget.deckName, _wordController.text, _translationController.text);
@@ -140,7 +159,7 @@ class _DeckDetailState extends State<DeckDetail> {
                           DataCell(Text(word["translation"]))
                         ],
                         onSelectChanged: (newValue) {
-                          print(word["word"]);
+                          //
                         }))
                     .toList()),
         floatingActionButton:
@@ -156,11 +175,15 @@ class _DeckDetailState extends State<DeckDetail> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => GamesDetail(
-                          id: widget.deckId,
-                          name: widget.deckName,
+                          deckId: widget.deckId,
+                          deckName: widget.deckName,
                         )),
               );
             },
+          ),
+          FloatingActionButton(
+            child: const Icon(Icons.upload),
+            onPressed: () => _uploadCsvFile(),
           ),
           FloatingActionButton(
             child: const Icon(Icons.download),
