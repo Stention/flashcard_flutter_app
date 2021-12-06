@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'dart:convert' show utf8;
 import "database_helper.dart";
@@ -107,21 +108,26 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   void _uploadCsvFile() async {
-    final directory = await getApplicationDocumentsDirectory();
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-    final inputCsvFile = File(directory.path + '/file.csv').openRead();
+    if (result != null) {
+      PlatformFile inputCsvFile = result.files.first;
 
-    final words = await inputCsvFile
-        .transform(utf8.decoder)
-        .transform(const CsvToListConverter(fieldDelimiter: ";"))
-        .toList();
+      final input = File(inputCsvFile.path.toString()).openRead();
+      final words = await input
+          .transform(utf8.decoder)
+          .transform(const CsvToListConverter(fieldDelimiter: ";"))
+          .toList();
 
-    for (List wordPair in words) {
-      await DatabaseHelper.createWord(
-          widget.deckName, wordPair[0], wordPair[1]);
+      for (List wordPair in words) {
+        await DatabaseHelper.createWord(
+            widget.deckName, wordPair[0], wordPair[1]);
+      }
     }
-
     _refreshDecks();
+
+    //final directory = await getApplicationDocumentsDirectory();
+    //final inputCsvFile = File(directory.path + '/file.csv').openRead();
   }
 
   Future<void> _addWord() async {
