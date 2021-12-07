@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "dart:math";
 import "database_helper.dart";
+import 'deck_games.dart';
 
 var finalScore = 0;
 var questionNumber = 0;
@@ -52,21 +53,24 @@ class QuizState extends State<Quiz> {
 
   _question(pool) {
     final _random = Random();
-    var wordsPool = pool;
-    var index = _random.nextInt(wordsPool.length);
-    return wordsPool[index];
+    if (pool.isNotEmpty) {
+      var wordsPool = pool;
+      return wordsPool[_random.nextInt(wordsPool.length)];
+    }
   }
 
   _answers(pool) {
     final _random = Random();
-    var wordsPool = pool;
-    var answersPool =
-        List.generate(3, (_) => wordsPool[_random.nextInt(wordsPool.length)]);
-    List answers = [];
-    for (var word in answersPool) {
-      answers.add(word["translation"]);
+    if (pool.isNotEmpty) {
+      var wordsPool = pool;
+      var answersPool =
+          List.generate(3, (_) => wordsPool[_random.nextInt(wordsPool.length)]);
+      List answers = [];
+      for (var word in answersPool) {
+        answers.add(word["translation"]);
+      }
+      return answers;
     }
-    return answers;
   }
 
   @override
@@ -79,7 +83,7 @@ class QuizState extends State<Quiz> {
   Widget build(BuildContext context) {
     var question = _question(_wordsPool);
     var answers = _answers(_wordsPool);
-    answers.add(question["translation"]);
+    question != null ? answers.add(question["translation"]) : "no data";
 
     var appBar = AppBar(title: const Text("Find the right translation"));
     return WillPopScope(
@@ -110,7 +114,8 @@ class QuizState extends State<Quiz> {
                       4,
                   width: MediaQuery.of(context).size.width,
                   child: Center(
-                      child: Text(question["word"],
+                      child: Text(
+                          question != null ? question["word"] : "no data",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.orange,
@@ -119,7 +124,7 @@ class QuizState extends State<Quiz> {
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
                 padding: const EdgeInsets.all(8),
-                itemCount: 4,
+                itemCount: answers != null ? answers.length : 0,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
                       width: MediaQuery.of(context).size.width,
@@ -147,12 +152,12 @@ class QuizState extends State<Quiz> {
               Container(
                   alignment: Alignment.bottomCenter,
                   child: MaterialButton(
-                      minWidth: 240.0,
-                      height: 30.0,
-                      onPressed: resetQuiz,
-                      child: const Text("Quit",
-                          style:
-                              TextStyle(fontSize: 18.0, color: Colors.white))))
+                    minWidth: 240.0,
+                    height: 30.0,
+                    child: const Text("Quit",
+                        style: TextStyle(fontSize: 18.0, color: Colors.blue)),
+                    onPressed: resetQuiz,
+                  ))
             ]),
           )),
     );
@@ -172,7 +177,8 @@ class QuizState extends State<Quiz> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Summary(score: finalScore)));
+                builder: (context) =>
+                    Summary(score: finalScore, deckName: widget.deckName)));
       } else {
         questionNumber++;
       }
@@ -182,7 +188,9 @@ class QuizState extends State<Quiz> {
 
 class Summary extends StatelessWidget {
   final int score;
-  const Summary({Key? key, required this.score}) : super(key: key);
+  final String deckName;
+  const Summary({Key? key, required this.score, required this.deckName})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -195,14 +203,16 @@ class Summary extends StatelessWidget {
             Text("Final score: $score", style: const TextStyle(fontSize: 25.0)),
             const Padding(padding: EdgeInsets.all(10.0)),
             MaterialButton(
-                color: Colors.red,
-                onPressed: () {
-                  questionNumber = 0;
-                  finalScore = 0;
-                  Navigator.pop(context);
-                },
-                child: const Text("Reset Quiz",
-                    style: TextStyle(fontSize: 20.0, color: Colors.white)))
+              color: Colors.red,
+              child: const Text("Back to games",
+                  style: TextStyle(fontSize: 20.0, color: Colors.white)),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GamesDetail(deckName: deckName)));
+              },
+            )
           ],
         ),
       ),

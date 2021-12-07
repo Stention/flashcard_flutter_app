@@ -27,7 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> _decks = [];
   bool _isLoading = true;
-  // This function is used to fetch all data from the database
+
   void _refreshDecks() async {
     final data = await DatabaseHelper.getDictionaries();
     setState(() {
