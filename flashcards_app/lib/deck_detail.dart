@@ -171,27 +171,30 @@ class _DeckDetailState extends State<DeckDetail> {
         floatingActionButton:
             Column(mainAxisAlignment: MainAxisAlignment.end, children: [
           FloatingActionButton(
+            heroTag: null,
             child: const Icon(Icons.add),
             onPressed: () => _showForm(),
           ),
           FloatingActionButton(
+            heroTag: null,
             child: const Icon(Icons.favorite),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => GamesDetail(
-                          deckId: widget.deckId,
                           deckName: widget.deckName,
                         )),
               );
             },
           ),
           FloatingActionButton(
+            heroTag: null,
             child: const Icon(Icons.upload),
             onPressed: () => _uploadCsvFile(),
           ),
           FloatingActionButton(
+            heroTag: null,
             child: const Icon(Icons.download),
             onPressed: () => _generateCsvFile(),
           ),

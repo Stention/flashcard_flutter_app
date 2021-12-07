@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-//import 'game_choose_from_4.dart';
 import 'quiz.dart';
 
 class GamesDetail extends StatelessWidget {
-  final int deckId;
   final String deckName;
-  const GamesDetail({Key? key, required this.deckId, required this.deckName})
-      : super(key: key);
+  const GamesDetail({Key? key, required this.deckName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +17,7 @@ class GamesDetail extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => Quiz(
-                        deckId: deckId,
-                        deckName: deckName,
-                      )),
+              MaterialPageRoute(builder: (context) => Quiz(deckName: deckName)),
             );
           },
         ),

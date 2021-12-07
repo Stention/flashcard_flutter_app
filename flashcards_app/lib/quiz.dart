@@ -4,13 +4,11 @@ import "database_helper.dart";
 
 var finalScore = 0;
 var questionNumber = 0;
-var numberOfQuestions = 5;
+var numberOfQuestions = 4;
 
 class Quiz extends StatefulWidget {
-  final int deckId;
   final String deckName;
-  const Quiz({Key? key, required this.deckId, required this.deckName})
-      : super(key: key);
+  const Quiz({Key? key, required this.deckName}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -19,21 +17,37 @@ class Quiz extends StatefulWidget {
 }
 
 class QuizState extends State<Quiz> {
-  List<Map<String, dynamic>> _words = [];
+  List<Map<String, dynamic>> _wordsPool = [];
+  Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+            title: const Text("Do you want to exit app?"),
+            actions: [
+              ElevatedButton(
+                child: const Text("Yes"),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+              ElevatedButton(
+                child: const Text("No"),
+                onPressed: () => Navigator.pop(context, false),
+              )
+            ]),
+      );
 
-  void _refreshDecks() async {
-    final data = await DatabaseHelper.getWords(widget.deckName);
-    setState(() {
-      _words = data;
-    });
-  }
-
-  _createWordsPool() {
+  void _createWordsPool() async {
     final _random = Random();
-    var wordsPool = List.generate(
-        numberOfQuestions, (_) => _words[_random.nextInt(_words.length)]);
-
-    return wordsPool;
+    final data = await DatabaseHelper.getWords(widget.deckName);
+    List<Map<String, dynamic>> wordsPool = [];
+    while (wordsPool.length < (numberOfQuestions + 1)) {
+      var newWord = data[_random.nextInt(data.length)];
+      wordsPool.add(newWord);
+      if (!wordsPool.contains(newWord)) {
+        wordsPool.add(newWord);
+      }
+    }
+    setState(() {
+      _wordsPool = wordsPool;
+    });
   }
 
   _question(pool) {
@@ -58,20 +72,21 @@ class QuizState extends State<Quiz> {
   @override
   void initState() {
     super.initState();
-    _refreshDecks();
+    _createWordsPool();
   }
 
   @override
   Widget build(BuildContext context) {
-    var _wordsPool = _createWordsPool();
-    print(_wordsPool);
     var question = _question(_wordsPool);
     var answers = _answers(_wordsPool);
     answers.add(question["translation"]);
 
     var appBar = AppBar(title: const Text("Find the right translation"));
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async {
+        final shouldPop = await showWarning(context);
+        return shouldPop ?? false;
+      },
       child: Scaffold(
           appBar: appBar,
           body: Container(
@@ -100,94 +115,35 @@ class QuizState extends State<Quiz> {
                               fontWeight: FontWeight.bold,
                               color: Colors.orange,
                               fontSize: 40.0)))),
-              Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 75,
-                  margin: const EdgeInsets.only(
-                      left: 20.0, right: 20.0, top: 15.0, bottom: 15.0),
-                  color: Colors.orange,
-                  child: MaterialButton(
-                      child: Text(answers[0],
-                          style: const TextStyle(
-                              fontSize: 20.0, color: Colors.white)),
-                      onPressed: () {
-                        if (question["translation"] == answers[0]) {
-                          debugPrint("Correct");
-                          finalScore++;
-                          _wordsPool.remove(question["word"]);
-                          // _wordsPool.removeWhere(
-                          //     (item) => item.word == question["word"]);
-                        } else {
-                          debugPrint("False");
-                        }
-                        updateQuestion();
-                      })),
-              Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 75,
-                  margin: const EdgeInsets.only(
-                      left: 20.0, right: 20.0, top: 15.0, bottom: 15.0),
-                  color: Colors.orange,
-                  child: MaterialButton(
-                      child: Text(answers[1],
-                          style: const TextStyle(
-                              fontSize: 20.0, color: Colors.white)),
-                      onPressed: () {
-                        if (question["translation"] == answers[1]) {
-                          debugPrint("Correct");
-                          finalScore++;
-                          _wordsPool.remove(question["word"]);
-                          //  wordsPool.removeWhere(
-                          //    (word) => word.word == question["word"]);
-                        } else {
-                          debugPrint("False");
-                        }
-                        updateQuestion();
-                      })),
-              Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 75,
-                  margin: const EdgeInsets.only(
-                      left: 20.0, right: 20.0, top: 15.0, bottom: 15.0),
-                  color: Colors.orange,
-                  child: MaterialButton(
-                      child: Text(answers[2],
-                          style: const TextStyle(
-                              fontSize: 20.0, color: Colors.white)),
-                      onPressed: () {
-                        if (question["translation"] == answers[2]) {
-                          debugPrint("Correct");
-                          finalScore++;
-                          _wordsPool.remove(question["word"]);
-                          //  wordsPool.removeWhere(
-                          //     (word) => word.word == question["word"]);
-                        } else {
-                          debugPrint("False");
-                        }
-                        updateQuestion();
-                      })),
-              Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 75,
-                  margin: const EdgeInsets.only(
-                      left: 20.0, right: 20.0, top: 15.0, bottom: 15.0),
-                  color: Colors.orange,
-                  child: MaterialButton(
-                      child: Text(answers[3],
-                          style: const TextStyle(
-                              fontSize: 20.0, color: Colors.white)),
-                      onPressed: () {
-                        if (question["translation"] == answers[3]) {
-                          debugPrint("Correct");
-                          finalScore++;
-                          _wordsPool.remove(question["word"]);
-                          //  wordsPool.removeWhere(
-                          //     (word) => word.word == question["word"]);
-                        } else {
-                          debugPrint("False");
-                        }
-                        updateQuestion();
-                      })),
+              ListView.separated(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(8),
+                itemCount: 4,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 75,
+                      color: Colors.orange,
+                      child: MaterialButton(
+                          child: Text(answers[index],
+                              style: const TextStyle(
+                                  fontSize: 20.0, color: Colors.white)),
+                          onPressed: () {
+                            if (question["translation"] == answers[index]) {
+                              debugPrint("Correct");
+                              finalScore++;
+                              //   _wordsPool.removeWhere(
+                              //     (item) => item["word"] == question["word"]);
+                            } else {
+                              debugPrint("False");
+                            }
+                            updateQuestion();
+                          }));
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    const Divider(),
+              ),
               Container(
                   alignment: Alignment.bottomCenter,
                   child: MaterialButton(
