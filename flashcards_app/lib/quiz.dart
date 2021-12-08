@@ -5,7 +5,7 @@ import 'deck_games.dart';
 
 var finalScore = 0;
 var questionNumber = 0;
-var numberOfQuestions = 4;
+var numberOfQuestions = 5;
 
 class Quiz extends StatefulWidget {
   final String deckName;
@@ -173,7 +173,7 @@ class QuizState extends State<Quiz> {
 
   void updateQuestion() {
     setState(() {
-      if (questionNumber == (numberOfQuestions - 1)) {
+      if (questionNumber == ((numberOfQuestions) - 1)) {
         Navigator.push(
             context,
             MaterialPageRoute(

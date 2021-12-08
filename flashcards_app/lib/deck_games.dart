@@ -3,6 +3,7 @@ import 'quiz.dart';
 
 class GamesDetail extends StatelessWidget {
   final String deckName;
+
   const GamesDetail({Key? key, required this.deckName}) : super(key: key);
 
   @override
@@ -16,9 +17,9 @@ class GamesDetail extends StatelessWidget {
           child: const Text("Find the translation"),
           onPressed: () {
             Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Quiz(deckName: deckName)),
-            );
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Quiz(deckName: deckName)));
           },
         ),
       ),
