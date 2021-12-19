@@ -1,15 +1,19 @@
 import "package:flutter/material.dart";
 import "dart:math";
+import 'package:collection/collection.dart';
 import "database_helper.dart";
 import 'deck_games.dart';
 
 var finalScore = 0;
 var questionNumber = 0;
-var numberOfQuestions = 5;
+//var numberOfQuestions = 5;
 
 class Quiz extends StatefulWidget {
   final String deckName;
-  const Quiz({Key? key, required this.deckName}) : super(key: key);
+  final String numberOfQuestions;
+  const Quiz(
+      {Key? key, required this.deckName, required this.numberOfQuestions})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -19,6 +23,7 @@ class Quiz extends StatefulWidget {
 
 class QuizState extends State<Quiz> {
   List<Map<String, dynamic>> _wordsPool = [];
+  int _numberOfQuestions = 0;
   Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -36,18 +41,11 @@ class QuizState extends State<Quiz> {
       );
 
   void _createWordsPool() async {
-    final _random = Random();
     final data = await DatabaseHelper.getWords(widget.deckName);
-    List<Map<String, dynamic>> wordsPool = [];
-    while (wordsPool.length < (numberOfQuestions + 1)) {
-      var newWord = data[_random.nextInt(data.length)];
-      wordsPool.add(newWord);
-      if (!wordsPool.contains(newWord)) {
-        wordsPool.add(newWord);
-      }
-    }
+    final numberOfQuestions = int.parse(widget.numberOfQuestions);
     setState(() {
-      _wordsPool = wordsPool;
+      _numberOfQuestions = numberOfQuestions;
+      _wordsPool = data.sample(numberOfQuestions);
     });
   }
 
@@ -103,7 +101,7 @@ class QuizState extends State<Quiz> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                            "Question ${questionNumber + 1} of $numberOfQuestions",
+                            "Question ${questionNumber + 1} of $_numberOfQuestions",
                             style: const TextStyle(fontSize: 22.0)),
                         Text("Score: $finalScore",
                             style: const TextStyle(fontSize: 22.0))
@@ -138,8 +136,8 @@ class QuizState extends State<Quiz> {
                             if (question["translation"] == answers[index]) {
                               debugPrint("Correct");
                               finalScore++;
-                              //   _wordsPool.removeWhere(
-                              //     (item) => item["word"] == question["word"]);
+                              _wordsPool.removeWhere(
+                                  (item) => item["word"] == question["word"]);
                             } else {
                               debugPrint("False");
                             }
@@ -173,7 +171,7 @@ class QuizState extends State<Quiz> {
 
   void updateQuestion() {
     setState(() {
-      if (questionNumber == ((numberOfQuestions) - 1)) {
+      if (questionNumber == ((_numberOfQuestions) - 1)) {
         Navigator.push(
             context,
             MaterialPageRoute(

@@ -65,10 +65,9 @@ class _DeckDetailState extends State<DeckDetail> {
                     ),
                     ElevatedButton(
                         onPressed: () async {
-                          // Save new journal
                           await _addWord();
-                          // Clear the text fields
                           _wordController.text = '';
+                          _translationController.text = '';
                           // Close the bottom sheet
                           Navigator.of(context).pop();
                         },
