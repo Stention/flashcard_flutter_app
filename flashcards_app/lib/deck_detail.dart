@@ -6,11 +6,10 @@ import 'dart:io';
 import 'dart:convert' show utf8;
 import "database_helper.dart";
 import 'deck_games.dart';
+import 'main.dart';
 
 class DeckDetail extends StatefulWidget {
-  const DeckDetail({Key? key, required this.deckId, required this.deckName})
-      : super(key: key);
-  final int deckId;
+  const DeckDetail({Key? key, required this.deckName}) : super(key: key);
   final String deckName;
 
   @override
@@ -139,8 +138,12 @@ class _DeckDetailState extends State<DeckDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.deckName),
-        ),
+            title: Text(widget.deckName),
+            leading: IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const HomePage())),
+            )),
         body: _isLoading
             ? const Center(
                 child: CircularProgressIndicator(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'quiz.dart';
+import 'deck_detail.dart';
 
 class GamesDetail extends StatelessWidget {
   final String deckName;
@@ -12,8 +13,14 @@ class GamesDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(deckName + " Games"),
-      ),
+          title: Text(deckName + " Games"),
+          leading: IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DeckDetail(deckName: deckName))),
+          )),
       body: Center(
         child: ElevatedButton(
           child: const Text("Find the translation"),
@@ -43,10 +50,6 @@ class GamesDetail extends StatelessWidget {
                                                 _numberOfQuestions.text)));
                               }),
                         ]));
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) => Quiz(deckName: deckName)));
           },
         ),
       ),

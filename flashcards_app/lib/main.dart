@@ -152,7 +152,6 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => DeckDetail(
-                                  deckId: _decks[index]['id'],
                                   deckName: _decks[index]['name'],
                                 )),
                       );
