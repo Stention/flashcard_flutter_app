@@ -6,7 +6,6 @@ import 'deck_games.dart';
 
 var finalScore = 0;
 var questionNumber = 0;
-//var numberOfQuestions = 5;
 
 class Quiz extends StatefulWidget {
   final String deckName;
@@ -22,7 +21,8 @@ class Quiz extends StatefulWidget {
 }
 
 class QuizState extends State<Quiz> {
-  List<Map<String, dynamic>> _wordsPool = [];
+  List<Map<String, dynamic>> _allWordsPool = [];
+  List<Map<String, dynamic>> _gameWordsPool = [];
   int _numberOfQuestions = 0;
   Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
         context: context,
@@ -44,28 +44,30 @@ class QuizState extends State<Quiz> {
     final data = await DatabaseHelper.getWords(widget.deckName);
     final numberOfQuestions = int.parse(widget.numberOfQuestions);
     setState(() {
+      _allWordsPool = data;
       _numberOfQuestions = numberOfQuestions;
-      _wordsPool = data.sample(numberOfQuestions);
+      _gameWordsPool = data.sample(numberOfQuestions);
     });
   }
 
-  _question(pool) {
+  _question(_gameWordsPool) {
     final _random = Random();
-    if (pool.isNotEmpty) {
-      var wordsPool = pool;
+    if (_gameWordsPool.isNotEmpty) {
+      var wordsPool = _gameWordsPool;
       return wordsPool[_random.nextInt(wordsPool.length)];
     }
   }
 
-  _answers(pool) {
+  _answers(_allWordsPool, correctAnswer) {
     final _random = Random();
-    if (pool.isNotEmpty) {
-      var wordsPool = pool;
-      var answersPool =
-          List.generate(3, (_) => wordsPool[_random.nextInt(wordsPool.length)]);
+    if (_allWordsPool.isNotEmpty) {
       List answers = [];
-      for (var word in answersPool) {
-        answers.add(word["translation"]);
+      while (answers.length < 3) {
+        var word = _allWordsPool[_random.nextInt(_allWordsPool.length)];
+        if (word["translation"] != correctAnswer &&
+            !answers.contains(word["translation"])) {
+          answers.add(word["translation"]);
+        }
       }
       return answers;
     }
@@ -79,8 +81,9 @@ class QuizState extends State<Quiz> {
 
   @override
   Widget build(BuildContext context) {
-    var question = _question(_wordsPool);
-    var answers = _answers(_wordsPool);
+    var question = _question(_gameWordsPool);
+    var correctAnswer = question != null ? question["translation"] : "no data";
+    var answers = _answers(_allWordsPool, correctAnswer);
     question != null ? answers.add(question["translation"]) : "no data";
 
     var appBar = AppBar(title: const Text("Find the right translation"));
@@ -136,8 +139,8 @@ class QuizState extends State<Quiz> {
                             if (question["translation"] == answers[index]) {
                               debugPrint("Correct");
                               finalScore++;
-                              _wordsPool.removeWhere(
-                                  (item) => item["word"] == question["word"]);
+                              _gameWordsPool.removeWhere((answer) =>
+                                  answer["word"] == question["word"]);
                             } else {
                               debugPrint("False");
                             }
@@ -175,8 +178,10 @@ class QuizState extends State<Quiz> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    Summary(score: finalScore, deckName: widget.deckName)));
+                builder: (context) => Summary(
+                    score: finalScore,
+                    deckName: widget.deckName,
+                    numberOfQuestions: _numberOfQuestions)));
       } else {
         questionNumber++;
       }
@@ -186,8 +191,13 @@ class QuizState extends State<Quiz> {
 
 class Summary extends StatelessWidget {
   final int score;
+  final int numberOfQuestions;
   final String deckName;
-  const Summary({Key? key, required this.score, required this.deckName})
+  const Summary(
+      {Key? key,
+      required this.score,
+      required this.numberOfQuestions,
+      required this.deckName})
       : super(key: key);
 
   @override
@@ -198,13 +208,16 @@ class Summary extends StatelessWidget {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("Final score: $score", style: const TextStyle(fontSize: 25.0)),
+            Text("Final score: $score / $numberOfQuestions",
+                style: const TextStyle(fontSize: 25.0)),
             const Padding(padding: EdgeInsets.all(10.0)),
             MaterialButton(
               color: Colors.red,
               child: const Text("Back to games",
                   style: TextStyle(fontSize: 20.0, color: Colors.white)),
               onPressed: () {
+                finalScore = 0;
+                questionNumber = 0;
                 Navigator.push(
                     context,
                     MaterialPageRoute(
