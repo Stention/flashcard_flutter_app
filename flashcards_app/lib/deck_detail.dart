@@ -19,6 +19,8 @@ class DeckDetail extends StatefulWidget {
 class _DeckDetailState extends State<DeckDetail> {
   List<Map<String, dynamic>> _words = [];
   bool _isLoading = true;
+  final TextEditingController _wordController = TextEditingController();
+  final TextEditingController _translationController = TextEditingController();
 
   void _refreshDecks() async {
     final data = await DatabaseHelper.getWords(widget.deckName);
@@ -34,11 +36,9 @@ class _DeckDetailState extends State<DeckDetail> {
     _refreshDecks();
   }
 
-  final TextEditingController _wordController = TextEditingController();
-  final TextEditingController _translationController = TextEditingController();
-
   void _showForm() async {
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         elevation: 5,
         builder: (_) => Container(
@@ -63,14 +63,14 @@ class _DeckDetailState extends State<DeckDetail> {
                       height: 10,
                     ),
                     ElevatedButton(
-                        onPressed: () async {
-                          await _addWord();
-                          _wordController.text = '';
-                          _translationController.text = '';
-                          // Close the bottom sheet
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text("Add a new word")),
+                      child: const Text("Add a new word"),
+                      onPressed: () async {
+                        await _addWord();
+                        _wordController.text = '';
+                        _translationController.text = '';
+                        Navigator.of(context).pop();
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -79,10 +79,10 @@ class _DeckDetailState extends State<DeckDetail> {
 
   void _generateCsvFile() async {
     final directory = await getApplicationDocumentsDirectory();
-
     List<List<dynamic>> rows = [];
-
     List<dynamic> header = [];
+    String deckName = widget.deckName;
+
     header.add("id");
     header.add("dictionary_name");
     header.add("sub_dictionary_name");
@@ -101,7 +101,7 @@ class _DeckDetailState extends State<DeckDetail> {
 
     String csv = const ListToCsvConverter(fieldDelimiter: ";").convert(rows);
 
-    File file = File(directory.path + "/csv.csv");
+    File file = File(directory.path + "/$deckName.csv");
     file.writeAsString(csv);
   }
 
@@ -148,28 +148,39 @@ class _DeckDetailState extends State<DeckDetail> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : DataTable(
-                showCheckboxColumn: false,
-                columns: const <DataColumn>[
-                  DataColumn(
-                      label: Text("Slovíčko",
-                          style: TextStyle(fontStyle: FontStyle.italic))),
-                  DataColumn(
-                      label: Text("Překlad",
-                          style: TextStyle(fontStyle: FontStyle.italic)))
-                ],
-                rows: _words
-                    .map((word) => DataRow(
-                        color: MaterialStateColor.resolveWith(
-                            (states) => Colors.red.shade100),
-                        cells: [
-                          DataCell(Text(word["word"])),
-                          DataCell(Text(word["translation"]))
-                        ],
-                        onSelectChanged: (newValue) {
-                          //
-                        }))
-                    .toList()),
+            : Container(
+                alignment: Alignment.topCenter,
+                child: DataTable(
+                    showCheckboxColumn: false,
+                    columns: const <DataColumn>[
+                      DataColumn(
+                        label: Center(
+                            child: Text("Slovíčko",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontStyle: FontStyle.italic))),
+                      ),
+                      DataColumn(
+                        label: Center(
+                            child: Text("Překlad",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontStyle: FontStyle.italic))),
+                      ),
+                    ],
+                    rows: _words
+                        .map((word) => DataRow(
+                            color: MaterialStateColor.resolveWith(
+                                (states) => Colors.red.shade100),
+                            cells: [
+                              DataCell(Text(word["word"],
+                                  textAlign: TextAlign.center)),
+                              DataCell(Text(word["translation"],
+                                  textAlign: TextAlign.center))
+                            ],
+                            onSelectChanged: (newValue) {
+                              //
+                            }))
+                        .toList()),
+              ),
         floatingActionButton:
             Column(mainAxisAlignment: MainAxisAlignment.end, children: [
           FloatingActionButton(

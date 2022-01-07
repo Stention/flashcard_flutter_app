@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'quiz.dart';
+import 'quiz_find_the_word.dart';
+import 'quiz_find_translation.dart';
 import 'deck_detail.dart';
 
 class GamesDetail extends StatelessWidget {
@@ -22,36 +23,68 @@ class GamesDetail extends StatelessWidget {
                     builder: (context) => DeckDetail(deckName: deckName))),
           )),
       body: Center(
-        child: ElevatedButton(
-          child: const Text("Find the translation"),
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                        title: const Text(
-                            "How many words do you wanna play with?"),
-                        content: TextField(
-                          controller: _numberOfQuestions,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                              child: const Text("Play"),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Quiz(
-                                            deckName: deckName,
-                                            numberOfQuestions:
-                                                _numberOfQuestions.text)));
-                              }),
-                        ]));
-          },
-        ),
+        child: Column(children: <Widget>[
+          ElevatedButton(
+            child: const Text("Find the word"),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                          title: const Text(
+                              "How many words do you wanna play with?"),
+                          content: TextField(
+                            controller: _numberOfQuestions,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                                child: const Text("Play"),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FindTheWord(
+                                              deckName: deckName,
+                                              numberOfQuestions:
+                                                  _numberOfQuestions.text)));
+                                }),
+                          ]));
+            },
+          ),
+          ElevatedButton(
+            child: const Text("Find the translation"),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                          title: const Text(
+                              "How many words do you wanna play with?"),
+                          content: TextField(
+                            controller: _numberOfQuestions,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                                child: const Text("Play"),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FindTranslation(
+                                              deckName: deckName,
+                                              numberOfQuestions:
+                                                  _numberOfQuestions.text)));
+                                }),
+                          ]));
+            },
+          ),
+        ]),
       ),
     );
   }

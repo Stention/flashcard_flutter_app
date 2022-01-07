@@ -7,20 +7,20 @@ import 'deck_games.dart';
 var finalScore = 0;
 var questionNumber = 0;
 
-class Quiz extends StatefulWidget {
+class FindTheWord extends StatefulWidget {
   final String deckName;
   final String numberOfQuestions;
-  const Quiz(
+  const FindTheWord(
       {Key? key, required this.deckName, required this.numberOfQuestions})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return QuizState();
+    return _QuizState();
   }
 }
 
-class QuizState extends State<Quiz> {
+class _QuizState extends State<FindTheWord> {
   List<Map<String, dynamic>> _allWordsPool = [];
   List<Map<String, dynamic>> _gameWordsPool = [];
   int _numberOfQuestions = 0;
@@ -64,9 +64,8 @@ class QuizState extends State<Quiz> {
       List answers = [];
       while (answers.length < 3) {
         var word = _allWordsPool[_random.nextInt(_allWordsPool.length)];
-        if (word["translation"] != correctAnswer &&
-            !answers.contains(word["translation"])) {
-          answers.add(word["translation"]);
+        if (word["word"] != correctAnswer && !answers.contains(word["word"])) {
+          answers.add(word["word"]);
         }
       }
       return answers;
@@ -82,9 +81,9 @@ class QuizState extends State<Quiz> {
   @override
   Widget build(BuildContext context) {
     var question = _question(_gameWordsPool);
-    var correctAnswer = question != null ? question["translation"] : "no data";
+    var correctAnswer = question != null ? question["word"] : "no data";
     var answers = _answers(_allWordsPool, correctAnswer);
-    question != null ? answers.add(question["translation"]) : "no data";
+    question != null ? answers.add(question["word"]) : "no data";
 
     var appBar = AppBar(title: const Text("Find the right translation"));
     return WillPopScope(
@@ -116,7 +115,9 @@ class QuizState extends State<Quiz> {
                   width: MediaQuery.of(context).size.width,
                   child: Center(
                       child: Text(
-                          question != null ? question["word"] : "no data",
+                          question != null
+                              ? question["translation"]
+                              : "no data",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.orange,
@@ -136,11 +137,12 @@ class QuizState extends State<Quiz> {
                               style: const TextStyle(
                                   fontSize: 20.0, color: Colors.white)),
                           onPressed: () {
-                            if (question["translation"] == answers[index]) {
+                            if (question["word"] == answers[index]) {
                               debugPrint("Correct");
                               finalScore++;
                               _gameWordsPool.removeWhere((answer) =>
-                                  answer["word"] == question["word"]);
+                                  answer["translation"] ==
+                                  question["translation"]);
                             } else {
                               debugPrint("False");
                             }

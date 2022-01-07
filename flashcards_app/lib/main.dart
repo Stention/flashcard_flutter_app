@@ -26,6 +26,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> _decks = [];
   bool _isLoading = true;
+  final TextEditingController _nameController = TextEditingController();
 
   void _refreshDecks() async {
     final data = await DatabaseHelper.getDictionaries();
@@ -41,19 +42,14 @@ class _HomePageState extends State<HomePage> {
     _refreshDecks();
   }
 
-  final TextEditingController _nameController = TextEditingController();
-
-  // This function will be triggered when the floating button is pressed
-  // It will also be triggered when you want to update an item
   void _showForm(int? id) async {
     if (id != null) {
-      // id == null -> create new item
-      // id != null -> update an existing item
       final existingDeck = _decks.firstWhere((element) => element['id'] == id);
       _nameController.text = existingDeck['name'];
     }
 
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         elevation: 5,
         builder: (_) => Container(
@@ -73,23 +69,17 @@ class _HomePageState extends State<HomePage> {
                       height: 10,
                     ),
                     ElevatedButton(
+                      child: Text(id == null ? 'Create New' : 'Update'),
                       onPressed: () async {
-                        // Save new journal
                         if (id == null) {
                           await _addItem();
                         }
-
                         if (id != null) {
                           await _updateItem(id);
                         }
-
-                        // Clear the text fields
                         _nameController.text = '';
-
-                        // Close the bottom sheet
                         Navigator.of(context).pop();
                       },
-                      child: Text(id == null ? 'Create New' : 'Update'),
                     )
                   ],
                 ),
