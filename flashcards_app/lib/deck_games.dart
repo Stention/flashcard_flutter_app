@@ -5,10 +5,12 @@ import 'quiz_find_translation.dart';
 import 'deck_detail.dart';
 
 class GamesDetail extends StatelessWidget {
+  final String deckId;
   final String deckName;
   final TextEditingController _numberOfQuestions = TextEditingController();
 
-  GamesDetail({Key? key, required this.deckName}) : super(key: key);
+  GamesDetail({Key? key, required this.deckId, required this.deckName})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,8 @@ class GamesDetail extends StatelessWidget {
             onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => DeckDetail(deckName: deckName))),
+                    builder: (context) =>
+                        DeckDetail(deckId: deckId, deckName: deckName))),
           )),
       body: Center(
         child: Column(children: <Widget>[
@@ -47,6 +50,7 @@ class GamesDetail extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => FindTheWord(
+                                              deckId: deckId,
                                               deckName: deckName,
                                               numberOfQuestions:
                                                   _numberOfQuestions.text)));
@@ -77,6 +81,7 @@ class GamesDetail extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => FindTranslation(
+                                              deckId: deckId,
                                               deckName: deckName,
                                               numberOfQuestions:
                                                   _numberOfQuestions.text)));

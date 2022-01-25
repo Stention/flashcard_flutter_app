@@ -10,16 +10,19 @@ class DatabaseHelper {
       """;
   static const wordPairs = """CREATE TABLE words_pairs(
          id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+         dictionary_id INTEGER NOT NULL,
          dictionary_name TEXT NOT NULL,
          sub_dictionary_name TEXT,
          word TEXT NOT NULL,
          translation TEXT NOT NULL,
-         FOREIGN KEY (dictionary_name) REFERENCES dictionary (name)
+         level TINYINT NOT NULL DEFAULT 0,
+         FOREIGN KEY (dictionary_id) REFERENCES dictionary (id)
+         FOREIGN KEY (dictionary_name) REFERENCES dictionary (name)     
        );
        """;
 
   static Future<sql.Database> db() async {
-    // await sql.deleteDatabase('demo_database.db');
+    //await sql.deleteDatabase('demo_database.db');
     return sql.openDatabase(
       'demo_database.db',
       version: 1,
@@ -58,17 +61,20 @@ class DatabaseHelper {
 
   static Future<void> deleteDictionary(int id) async {
     final db = await DatabaseHelper.db();
+    db.query('dictionary', where: "id = ?", whereArgs: [id], limit: 1);
     try {
       await db.delete("dictionary", where: "id = ?", whereArgs: [id]);
+      await db.delete("wordPairs", where: "dictionary_id = ?", whereArgs: [id]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
   }
 
-  static Future<int> createWord(
-      String dictionaryName, String word, String translation) async {
+  static Future<int> createWord(String dictionaryId, String dictionaryName,
+      String word, String translation) async {
     final db = await DatabaseHelper.db();
     final data = {
+      'dictionary_id': dictionaryId,
       'dictionary_name': dictionaryName,
       'word': word,
       'translation': translation
@@ -85,5 +91,17 @@ class DatabaseHelper {
         where: "dictionary_name = ?",
         whereArgs: [dictionaryName],
         orderBy: "id");
+  }
+
+  static Future<int> increaseLevel(int id, int currentLevel) async {
+    while (currentLevel < 11) {
+      var newLevel = currentLevel + 1;
+      final db = await DatabaseHelper.db();
+      final data = {'level': newLevel};
+      final result = await db
+          .update('words_pairs', data, where: "id = ?", whereArgs: [id]);
+      return result;
+    }
+    return currentLevel;
   }
 }

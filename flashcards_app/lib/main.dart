@@ -72,10 +72,10 @@ class _HomePageState extends State<HomePage> {
                       child: Text(id == null ? 'Create New' : 'Update'),
                       onPressed: () async {
                         if (id == null) {
-                          await _addItem();
+                          await _addDict();
                         }
                         if (id != null) {
-                          await _updateItem(id);
+                          await _updateDict(id);
                         }
                         _nameController.text = '';
                         Navigator.of(context).pop();
@@ -87,12 +87,12 @@ class _HomePageState extends State<HomePage> {
             ));
   }
 
-  Future<void> _addItem() async {
+  Future<void> _addDict() async {
     await DatabaseHelper.createDictionary(_nameController.text);
     _refreshDecks();
   }
 
-  Future<void> _updateItem(int id) async {
+  Future<void> _updateDict(int id) async {
     await DatabaseHelper.updateDictionary(id, _nameController.text);
     _refreshDecks();
   }
@@ -142,6 +142,7 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => DeckDetail(
+                                  deckId: _decks[index]['id'].toString(),
                                   deckName: _decks[index]['name'],
                                 )),
                       );

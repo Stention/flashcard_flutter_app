@@ -8,10 +8,14 @@ var finalScore = 0;
 var questionNumber = 0;
 
 class FindTheWord extends StatefulWidget {
+  final String deckId;
   final String deckName;
   final String numberOfQuestions;
   const FindTheWord(
-      {Key? key, required this.deckName, required this.numberOfQuestions})
+      {Key? key,
+      required this.deckId,
+      required this.deckName,
+      required this.numberOfQuestions})
       : super(key: key);
 
   @override
@@ -48,6 +52,10 @@ class _QuizState extends State<FindTheWord> {
       _numberOfQuestions = numberOfQuestions;
       _gameWordsPool = data.sample(numberOfQuestions);
     });
+  }
+
+  Future<void> _updateLevel(int id, int level) async {
+    await DatabaseHelper.increaseLevel(id, level);
   }
 
   _question(_gameWordsPool) {
@@ -139,6 +147,7 @@ class _QuizState extends State<FindTheWord> {
                           onPressed: () {
                             if (question["word"] == answers[index]) {
                               debugPrint("Correct");
+                              _updateLevel(question["id"], question["level"]);
                               finalScore++;
                               _gameWordsPool.removeWhere((answer) =>
                                   answer["translation"] ==
@@ -182,6 +191,7 @@ class _QuizState extends State<FindTheWord> {
             MaterialPageRoute(
                 builder: (context) => Summary(
                     score: finalScore,
+                    deckId: widget.deckId,
                     deckName: widget.deckName,
                     numberOfQuestions: _numberOfQuestions)));
       } else {
@@ -194,11 +204,13 @@ class _QuizState extends State<FindTheWord> {
 class Summary extends StatelessWidget {
   final int score;
   final int numberOfQuestions;
+  final String deckId;
   final String deckName;
   const Summary(
       {Key? key,
       required this.score,
       required this.numberOfQuestions,
+      required this.deckId,
       required this.deckName})
       : super(key: key);
 
@@ -223,7 +235,8 @@ class Summary extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => GamesDetail(deckName: deckName)));
+                        builder: (context) =>
+                            GamesDetail(deckId: deckId, deckName: deckName)));
               },
             )
           ],

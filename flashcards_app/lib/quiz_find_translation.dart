@@ -8,10 +8,14 @@ var finalScore = 0;
 var questionNumber = 0;
 
 class FindTranslation extends StatefulWidget {
+  final String deckId;
   final String deckName;
   final String numberOfQuestions;
   const FindTranslation(
-      {Key? key, required this.deckName, required this.numberOfQuestions})
+      {Key? key,
+      required this.deckId,
+      required this.deckName,
+      required this.numberOfQuestions})
       : super(key: key);
 
   @override
@@ -180,6 +184,7 @@ class _QuizState extends State<FindTranslation> {
             MaterialPageRoute(
                 builder: (context) => Summary(
                     score: finalScore,
+                    deckId: widget.deckId,
                     deckName: widget.deckName,
                     numberOfQuestions: _numberOfQuestions)));
       } else {
@@ -192,11 +197,13 @@ class _QuizState extends State<FindTranslation> {
 class Summary extends StatelessWidget {
   final int score;
   final int numberOfQuestions;
+  final String deckId;
   final String deckName;
   const Summary(
       {Key? key,
       required this.score,
       required this.numberOfQuestions,
+      required this.deckId,
       required this.deckName})
       : super(key: key);
 
@@ -221,7 +228,8 @@ class Summary extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => GamesDetail(deckName: deckName)));
+                        builder: (context) =>
+                            GamesDetail(deckId: deckId, deckName: deckName)));
               },
             )
           ],

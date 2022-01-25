@@ -9,7 +9,9 @@ import 'deck_games.dart';
 import 'main.dart';
 
 class DeckDetail extends StatefulWidget {
-  const DeckDetail({Key? key, required this.deckName}) : super(key: key);
+  const DeckDetail({Key? key, required this.deckId, required this.deckName})
+      : super(key: key);
+  final String deckId;
   final String deckName;
 
   @override
@@ -84,6 +86,7 @@ class _DeckDetailState extends State<DeckDetail> {
     String deckName = widget.deckName;
 
     header.add("id");
+    header.add("dictionary_id");
     header.add("dictionary_name");
     header.add("sub_dictionary_name");
     header.add("word");
@@ -92,6 +95,7 @@ class _DeckDetailState extends State<DeckDetail> {
     for (int i = 0; i < _words.length; i++) {
       List<dynamic> row = [];
       row.add(_words[i]["id"]);
+      row.add(_words[i]["dictionary_id"]);
       row.add(_words[i]["dictionary_name"]);
       row.add(_words[i]["sub_dictionary_name"]);
       row.add(_words[i]["word"]);
@@ -119,7 +123,7 @@ class _DeckDetailState extends State<DeckDetail> {
 
       for (List wordPair in words) {
         await DatabaseHelper.createWord(
-            widget.deckName, wordPair[0], wordPair[1]);
+            widget.deckId, widget.deckName, wordPair[0], wordPair[1]);
       }
     }
     _refreshDecks();
@@ -129,8 +133,8 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _addWord() async {
-    await DatabaseHelper.createWord(
-        widget.deckName, _wordController.text, _translationController.text);
+    await DatabaseHelper.createWord(widget.deckId, widget.deckName,
+        _wordController.text, _translationController.text);
     _refreshDecks();
   }
 
@@ -165,6 +169,12 @@ class _DeckDetailState extends State<DeckDetail> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontStyle: FontStyle.italic))),
                       ),
+                      DataColumn(
+                        label: Center(
+                            child: Text("Úrověň",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontStyle: FontStyle.italic))),
+                      ),
                     ],
                     rows: _words
                         .map((word) => DataRow(
@@ -174,7 +184,9 @@ class _DeckDetailState extends State<DeckDetail> {
                               DataCell(Text(word["word"],
                                   textAlign: TextAlign.center)),
                               DataCell(Text(word["translation"],
-                                  textAlign: TextAlign.center))
+                                  textAlign: TextAlign.center)),
+                              DataCell(Text(word["level"].toString(),
+                                  textAlign: TextAlign.center)),
                             ],
                             onSelectChanged: (newValue) {
                               //
@@ -196,6 +208,7 @@ class _DeckDetailState extends State<DeckDetail> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => GamesDetail(
+                          deckId: widget.deckId,
                           deckName: widget.deckName,
                         )),
               );
