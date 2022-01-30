@@ -54,8 +54,8 @@ class _QuizState extends State<FindTheWord> {
     });
   }
 
-  Future<void> _updateLevel(int id, int level) async {
-    await DatabaseHelper.increaseLevel(id, level);
+  Future<void> _updateLevel(int id, int level, answer) async {
+    await DatabaseHelper.changeLevel(id, level, answer);
   }
 
   _question(_gameWordsPool) {
@@ -147,13 +147,16 @@ class _QuizState extends State<FindTheWord> {
                           onPressed: () {
                             if (question["word"] == answers[index]) {
                               debugPrint("Correct");
-                              _updateLevel(question["id"], question["level"]);
+                              _updateLevel(
+                                  question["id"], question["level"], "correct");
                               finalScore++;
                               _gameWordsPool.removeWhere((answer) =>
                                   answer["translation"] ==
                                   question["translation"]);
                             } else {
                               debugPrint("False");
+                              _updateLevel(
+                                  question["id"], question["level"], "false");
                             }
                             updateQuestion();
                           }));

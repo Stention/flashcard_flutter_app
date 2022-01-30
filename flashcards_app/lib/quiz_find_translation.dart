@@ -54,6 +54,10 @@ class _QuizState extends State<FindTranslation> {
     });
   }
 
+  Future<void> _updateLevel(int id, int level, answer) async {
+    await DatabaseHelper.changeLevel(id, level, answer);
+  }
+
   _question(_gameWordsPool) {
     final _random = Random();
     if (_gameWordsPool.isNotEmpty) {
@@ -142,11 +146,15 @@ class _QuizState extends State<FindTranslation> {
                           onPressed: () {
                             if (question["translation"] == answers[index]) {
                               debugPrint("Correct");
+                              _updateLevel(
+                                  question["id"], question["level"], "correct");
                               finalScore++;
                               _gameWordsPool.removeWhere((answer) =>
                                   answer["word"] == question["word"]);
                             } else {
                               debugPrint("False");
+                              _updateLevel(
+                                  question["id"], question["level"], "false");
                             }
                             updateQuestion();
                           }));

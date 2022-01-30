@@ -142,8 +142,12 @@ class _DeckDetailState extends State<DeckDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text(widget.deckName),
+            backgroundColor: Colors.white,
+            title: Text(widget.deckName,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold)),
             leading: IconButton(
+              color: Colors.black,
               icon: const Icon(Icons.chevron_left),
               onPressed: () => Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const HomePage())),
@@ -171,7 +175,7 @@ class _DeckDetailState extends State<DeckDetail> {
                       ),
                       DataColumn(
                         label: Center(
-                            child: Text("Úrověň",
+                            child: Text("Úroveň",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontStyle: FontStyle.italic))),
                       ),
@@ -179,7 +183,7 @@ class _DeckDetailState extends State<DeckDetail> {
                     rows: _words
                         .map((word) => DataRow(
                             color: MaterialStateColor.resolveWith(
-                                (states) => Colors.red.shade100),
+                                (states) => Colors.grey.shade100),
                             cells: [
                               DataCell(Text(word["word"],
                                   textAlign: TextAlign.center)),

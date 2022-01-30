@@ -61,10 +61,14 @@ class DatabaseHelper {
 
   static Future<void> deleteDictionary(int id) async {
     final db = await DatabaseHelper.db();
-    db.query('dictionary', where: "id = ?", whereArgs: [id], limit: 1);
     try {
       await db.delete("dictionary", where: "id = ?", whereArgs: [id]);
-      await db.delete("wordPairs", where: "dictionary_id = ?", whereArgs: [id]);
+      await db.query("words_pairs",
+                  where: "dictionary_id = ?", whereArgs: [id]) ==
+              []
+          ? await db.delete("words_pairs",
+              where: "dictionary_id = ?", whereArgs: [id])
+          : null;
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -93,14 +97,26 @@ class DatabaseHelper {
         orderBy: "id");
   }
 
-  static Future<int> increaseLevel(int id, int currentLevel) async {
-    while (currentLevel < 11) {
-      var newLevel = currentLevel + 1;
-      final db = await DatabaseHelper.db();
-      final data = {'level': newLevel};
-      final result = await db
-          .update('words_pairs', data, where: "id = ?", whereArgs: [id]);
-      return result;
+  static Future<int> changeLevel(
+      int id, int currentLevel, String answer) async {
+    final db = await DatabaseHelper.db();
+
+    if (answer == "correct") {
+      while (0 <= currentLevel && currentLevel < 10) {
+        var newLevel = currentLevel + 1;
+        final data = {'level': newLevel};
+        final result = await db
+            .update('words_pairs', data, where: "id = ?", whereArgs: [id]);
+        return result;
+      }
+    } else if (answer == "false") {
+      while (0 < currentLevel && currentLevel <= 10) {
+        var newLevel = currentLevel - 1;
+        final data = {'level': newLevel};
+        final result = await db
+            .update('words_pairs', data, where: "id = ?", whereArgs: [id]);
+        return result;
+      }
     }
     return currentLevel;
   }

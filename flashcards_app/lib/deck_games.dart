@@ -16,8 +16,12 @@ class GamesDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(deckName + " Games"),
+          backgroundColor: Colors.white,
+          title: Text(deckName + " Games",
+              style: const TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold)),
           leading: IconButton(
+            color: Colors.black,
             icon: const Icon(Icons.chevron_left),
             onPressed: () => Navigator.push(
                 context,

@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
 
   void _showForm(int? id) async {
     if (id != null) {
-      final existingDeck = _decks.firstWhere((element) => element['id'] == id);
+      final existingDeck = _decks.firstWhere((deck) => deck['id'] == id);
       _nameController.text = existingDeck['name'];
     }
 
@@ -69,7 +69,13 @@ class _HomePageState extends State<HomePage> {
                       height: 10,
                     ),
                     ElevatedButton(
-                      child: Text(id == null ? 'Create New' : 'Update'),
+                      child: Text(id == null ? 'Create New' : 'Update',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black)),
                       onPressed: () async {
                         if (id == null) {
                           await _addDict();
@@ -109,7 +115,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Language Decks'),
+        backgroundColor: Colors.white,
+        title: const Text('Language Decks',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       ),
       body: _isLoading
           ? const Center(
@@ -118,20 +126,22 @@ class _HomePageState extends State<HomePage> {
           : ListView.builder(
               itemCount: _decks.length,
               itemBuilder: (context, index) => Card(
-                color: Colors.orange[200],
+                color: Colors.black,
                 margin: const EdgeInsets.all(15),
                 child: ListTile(
-                    title: Text(_decks[index]['name']),
+                    title: Text(_decks[index]['name'],
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
                     trailing: SizedBox(
                       width: 100,
                       child: Row(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.edit),
+                            icon: const Icon(Icons.edit, color: Colors.white),
                             onPressed: () => _showForm(_decks[index]['id']),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: const Icon(Icons.delete, color: Colors.white),
                             onPressed: () => _deleteItem(_decks[index]['id']),
                           ),
                         ],
@@ -151,6 +161,7 @@ class _HomePageState extends State<HomePage> {
             ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
+        backgroundColor: Colors.black,
         onPressed: () => _showForm(null),
       ),
     );
