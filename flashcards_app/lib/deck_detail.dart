@@ -7,6 +7,7 @@ import 'dart:convert' show utf8;
 import "database_helper.dart";
 import 'deck_games.dart';
 import 'main.dart';
+import 'painter.dart';
 
 class DeckDetail extends StatefulWidget {
   const DeckDetail({Key? key, required this.deckId, required this.deckName})
@@ -227,6 +228,16 @@ class _DeckDetailState extends State<DeckDetail> {
             heroTag: null,
             child: const Icon(Icons.download),
             onPressed: () => _generateCsvFile(),
+          ),
+          FloatingActionButton(
+            heroTag: null,
+            child: const Icon(Icons.favorite_border),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyPainter()),
+              );
+            },
           ),
         ]));
   }
