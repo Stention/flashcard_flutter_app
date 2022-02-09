@@ -28,17 +28,29 @@ class _QuizState extends State<FindTranslation> {
   List<Map<String, dynamic>> _allWordsPool = [];
   List<Map<String, dynamic>> _gameWordsPool = [];
   int _numberOfQuestions = 0;
+
   Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-            title: const Text("Do you want to exit app?"),
+            title: const Text("Do you want to exit the game?"),
             actions: [
               ElevatedButton(
-                child: const Text("Yes"),
-                onPressed: () => Navigator.pop(context, true),
-              ),
+                  child: const Text("Yes",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.black)),
+                  onPressed: () => setState(() {
+                        Navigator.pop(context, true);
+                        finalScore = 0;
+                        questionNumber = 0;
+                      })),
               ElevatedButton(
-                child: const Text("No"),
+                child: const Text("No",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.black)),
                 onPressed: () => Navigator.pop(context, false),
               )
             ]),
@@ -94,7 +106,12 @@ class _QuizState extends State<FindTranslation> {
     var answers = _answers(_allWordsPool, correctAnswer);
     question != null ? answers.add(question["translation"]) : "no data";
 
-    var appBar = AppBar(title: const Text("Find the right translation"));
+    var appBar = AppBar(
+        backgroundColor: Colors.black,
+        title: const Text("Select the right translation",
+            style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold)));
+
     return WillPopScope(
       onWillPop: () async {
         final shouldPop = await showWarning(context);
@@ -111,11 +128,12 @@ class _QuizState extends State<FindTranslation> {
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(
-                            "Question ${questionNumber + 1} of $_numberOfQuestions",
-                            style: const TextStyle(fontSize: 22.0)),
+                        Text("${questionNumber + 1} / $_numberOfQuestions",
+                            style: const TextStyle(
+                                fontSize: 22.0, fontWeight: FontWeight.bold)),
                         Text("Score: $finalScore",
-                            style: const TextStyle(fontSize: 22.0))
+                            style: const TextStyle(
+                                fontSize: 22.0, fontWeight: FontWeight.bold))
                       ])),
               SizedBox(
                   height: (MediaQuery.of(context).size.height -
@@ -127,8 +145,8 @@ class _QuizState extends State<FindTranslation> {
                           question != null ? question["word"] : "no data",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.orange,
-                              fontSize: 40.0)))),
+                              color: Colors.black,
+                              fontSize: 30.0)))),
               ListView.separated(
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
@@ -138,7 +156,7 @@ class _QuizState extends State<FindTranslation> {
                   return Container(
                       width: MediaQuery.of(context).size.width,
                       height: 75,
-                      color: Colors.orange,
+                      color: Colors.black,
                       child: MaterialButton(
                           child: Text(answers[index],
                               style: const TextStyle(
@@ -162,26 +180,9 @@ class _QuizState extends State<FindTranslation> {
                 separatorBuilder: (BuildContext context, int index) =>
                     const Divider(),
               ),
-              Container(
-                  alignment: Alignment.bottomCenter,
-                  child: MaterialButton(
-                    minWidth: 240.0,
-                    height: 30.0,
-                    child: const Text("Quit",
-                        style: TextStyle(fontSize: 18.0, color: Colors.blue)),
-                    onPressed: resetQuiz,
-                  ))
             ]),
           )),
     );
-  }
-
-  void resetQuiz() {
-    setState(() {
-      Navigator.pop(context);
-      finalScore = 0;
-      questionNumber = 0;
-    });
   }
 
   void updateQuestion() {

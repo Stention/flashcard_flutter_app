@@ -32,7 +32,11 @@ class GamesDetail extends StatelessWidget {
       body: Center(
         child: Column(children: <Widget>[
           ElevatedButton(
-            child: const Text("Find the word"),
+            child: const Text("Find the word",
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.black)),
             onPressed: () {
               showDialog(
                   context: context,
@@ -63,7 +67,11 @@ class GamesDetail extends StatelessWidget {
             },
           ),
           ElevatedButton(
-            child: const Text("Find the translation"),
+            child: const Text("Find the translation",
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.black)),
             onPressed: () {
               showDialog(
                   context: context,

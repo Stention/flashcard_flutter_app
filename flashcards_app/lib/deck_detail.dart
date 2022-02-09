@@ -7,7 +7,6 @@ import 'dart:convert' show utf8;
 import "database_helper.dart";
 import 'deck_games.dart';
 import 'main.dart';
-import 'painter.dart';
 
 class DeckDetail extends StatefulWidget {
   const DeckDetail({Key? key, required this.deckId, required this.deckName})
@@ -55,18 +54,38 @@ class _DeckDetailState extends State<DeckDetail> {
                   children: [
                     TextField(
                       controller: _wordController,
-                      decoration: const InputDecoration(hintText: 'word'),
+                      decoration: const InputDecoration(
+                        hintText: 'word',
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 2.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
                     ),
                     TextField(
                       controller: _translationController,
-                      decoration:
-                          const InputDecoration(hintText: 'translation'),
+                      decoration: const InputDecoration(
+                        hintText: 'translation',
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 2.0),
+                        ),
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
                     ElevatedButton(
-                      child: const Text("Add a new word"),
+                      child: const Text("Add a new word",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black)),
                       onPressed: () async {
                         await _addWord();
                         _wordController.text = '';
@@ -157,26 +176,25 @@ class _DeckDetailState extends State<DeckDetail> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : Container(
-                alignment: Alignment.topCenter,
-                child: DataTable(
+            : ListView(children: [
+                DataTable(
                     showCheckboxColumn: false,
                     columns: const <DataColumn>[
                       DataColumn(
                         label: Center(
-                            child: Text("Slovíčko",
+                            child: Text("Word",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontStyle: FontStyle.italic))),
                       ),
                       DataColumn(
                         label: Center(
-                            child: Text("Překlad",
+                            child: Text("Translation",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontStyle: FontStyle.italic))),
                       ),
                       DataColumn(
                         label: Center(
-                            child: Text("Úroveň",
+                            child: Text("Level",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontStyle: FontStyle.italic))),
                       ),
@@ -197,17 +215,19 @@ class _DeckDetailState extends State<DeckDetail> {
                               //
                             }))
                         .toList()),
-              ),
+              ]),
         floatingActionButton:
             Column(mainAxisAlignment: MainAxisAlignment.end, children: [
           FloatingActionButton(
             heroTag: null,
             child: const Icon(Icons.add),
+            backgroundColor: Colors.black,
             onPressed: () => _showForm(),
           ),
           FloatingActionButton(
             heroTag: null,
-            child: const Icon(Icons.favorite),
+            child: const Icon(Icons.favorite_border),
+            backgroundColor: Colors.black,
             onPressed: () {
               Navigator.push(
                 context,
@@ -222,22 +242,14 @@ class _DeckDetailState extends State<DeckDetail> {
           FloatingActionButton(
             heroTag: null,
             child: const Icon(Icons.upload),
+            backgroundColor: Colors.black,
             onPressed: () => _uploadCsvFile(),
           ),
           FloatingActionButton(
             heroTag: null,
             child: const Icon(Icons.download),
+            backgroundColor: Colors.black,
             onPressed: () => _generateCsvFile(),
-          ),
-          FloatingActionButton(
-            heroTag: null,
-            child: const Icon(Icons.favorite_border),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyPainter()),
-              );
-            },
           ),
         ]));
   }

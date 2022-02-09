@@ -64,7 +64,13 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(hintText: 'Name'),
+                      decoration: const InputDecoration(
+                        hintText: 'Name',
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 2.0),
+                        ),
+                      ),
                     ),
                     const SizedBox(
                       height: 10,
