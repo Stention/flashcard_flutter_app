@@ -48,7 +48,6 @@ class _HomePageState extends State<HomePage> {
       final existingDeck = _decks.firstWhere((deck) => deck['id'] == id);
       _nameController.text = existingDeck['name'];
     }
-
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -124,7 +123,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text('Language Decks',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
       ),
       body: _isLoading
           ? const Center(
@@ -133,7 +132,7 @@ class _HomePageState extends State<HomePage> {
           : ListView.builder(
               itemCount: _decks.length,
               itemBuilder: (context, index) => Card(
-                color: Colors.black,
+                color: Colors.grey[800],
                 margin: const EdgeInsets.all(15),
                 child: ListTile(
                     title: Text(_decks[index]['name'],
@@ -168,7 +167,7 @@ class _HomePageState extends State<HomePage> {
             ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.grey[800],
         onPressed: () => _showForm(null),
       ),
     );
