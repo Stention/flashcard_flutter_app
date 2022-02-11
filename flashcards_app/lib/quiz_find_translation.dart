@@ -1,11 +1,8 @@
+import 'package:flashcards_app/summary.dart';
 import "package:flutter/material.dart";
 import "dart:math";
 import 'package:collection/collection.dart';
 import "database_helper.dart";
-import 'deck_games.dart';
-
-var finalScore = 0;
-var questionNumber = 0;
 
 class FindTranslation extends StatefulWidget {
   final String deckId;
@@ -188,62 +185,16 @@ class _QuizState extends State<FindTranslation> {
   void updateQuestion() {
     setState(() {
       if (questionNumber == ((_numberOfQuestions) - 1)) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Summary(
-                    score: finalScore,
-                    deckId: widget.deckId,
-                    deckName: widget.deckName,
-                    numberOfQuestions: _numberOfQuestions)));
+        showModalBottomSheet<void>(
+            context: context,
+            builder: (context) => Summary(
+                score: finalScore,
+                deckId: widget.deckId,
+                deckName: widget.deckName,
+                numberOfQuestions: _numberOfQuestions));
       } else {
         questionNumber++;
       }
     });
-  }
-}
-
-class Summary extends StatelessWidget {
-  final int score;
-  final int numberOfQuestions;
-  final String deckId;
-  final String deckName;
-  const Summary(
-      {Key? key,
-      required this.score,
-      required this.numberOfQuestions,
-      required this.deckId,
-      required this.deckName})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Final score: $score / $numberOfQuestions",
-                style: const TextStyle(fontSize: 25.0)),
-            const Padding(padding: EdgeInsets.all(10.0)),
-            MaterialButton(
-              color: Colors.red,
-              child: const Text("Back to games",
-                  style: TextStyle(fontSize: 20.0, color: Colors.white)),
-              onPressed: () {
-                finalScore = 0;
-                questionNumber = 0;
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            GamesDetail(deckId: deckId, deckName: deckName)));
-              },
-            )
-          ],
-        ),
-      ),
-    );
   }
 }
