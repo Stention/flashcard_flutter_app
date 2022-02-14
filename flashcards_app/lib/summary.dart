@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'deck_games.dart';
+import 'deck_detail.dart';
 
 var finalScore = 0;
 var questionNumber = 0;
@@ -32,7 +32,7 @@ class Summary extends StatelessWidget {
               const Padding(padding: EdgeInsets.all(10.0)),
               MaterialButton(
                 color: Colors.grey,
-                child: const Text("Back to games",
+                child: const Text("Back to deck",
                     style: TextStyle(fontSize: 20.0, color: Colors.white)),
                 onPressed: () {
                   finalScore = 0;
@@ -41,7 +41,7 @@ class Summary extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              GamesDetail(deckId: deckId, deckName: deckName)));
+                              DeckDetail(deckId: deckId, deckName: deckName)));
                 },
               )
             ],

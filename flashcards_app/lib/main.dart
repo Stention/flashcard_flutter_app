@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
     _refreshDecks();
   }
 
-  void _deleteItem(int id) async {
+  void _deleteDict(int id) async {
     await DatabaseHelper.deleteDictionary(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Successfully deleted a deck!'),
@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
             )
           : ListView.builder(
               itemCount: _decks.length,
-              itemBuilder: (context, index) => Card(
+              itemBuilder: (BuildContext context, int index) => Card(
                 color: Colors.grey[800],
                 margin: const EdgeInsets.all(15),
                 child: ListTile(
@@ -148,7 +148,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.white),
-                            onPressed: () => _deleteItem(_decks[index]['id']),
+                            onPressed: () => _deleteDict(_decks[index]['id']),
                           ),
                         ],
                       ),
