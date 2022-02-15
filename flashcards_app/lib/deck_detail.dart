@@ -2,6 +2,7 @@ import 'package:flashcards_app/quiz_find_the_word.dart';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -26,6 +27,8 @@ class _DeckDetailState extends State<DeckDetail> {
   List<Map<String, dynamic>> _words = [];
   List<Map<String, dynamic>> _subDecks = [];
   bool _isLoading = true;
+  // bool _isPlaying = false;
+  final FlutterTts tts = FlutterTts();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _wordController = TextEditingController();
   final TextEditingController _translationController = TextEditingController();
@@ -46,6 +49,11 @@ class _DeckDetailState extends State<DeckDetail> {
     super.initState();
     _refreshDecks();
   }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
 
   void _showSubDeckForm() async {
     showModalBottomSheet(
@@ -399,6 +407,8 @@ class _DeckDetailState extends State<DeckDetail> {
 
   @override
   Widget build(BuildContext context) {
+    tts.setLanguage('fr-CA');
+    tts.setSpeechRate(0.5);
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.white,
@@ -452,9 +462,14 @@ class _DeckDetailState extends State<DeckDetail> {
                                     _words[index]["level"].toString() +
                                     ' )'),
                                 trailing: SizedBox(
-                                  width: 100,
+                                  width: 150,
                                   child: Row(
                                     children: [
+                                      IconButton(
+                                          icon:
+                                              const Icon(Icons.surround_sound),
+                                          onPressed: () =>
+                                              tts.speak(_words[index]["word"])),
                                       IconButton(
                                           icon: const Icon(Icons.edit),
                                           onPressed: () =>
