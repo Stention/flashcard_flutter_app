@@ -205,32 +205,39 @@ class _DeckDetailState extends State<DeckDetail> {
           child: const Icon(Icons.verified_rounded, color: Colors.white),
           backgroundColor: Colors.black,
           onTap: () {
-            showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                        title: const Text(
-                            "How many words do you wanna play with?"),
-                        content: TextField(
-                          controller: _numberOfQuestions,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                              child: const Text("Play"),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => FindTheWord(
-                                            deckId: widget.deckId,
-                                            deckName: widget.deckName,
-                                            numberOfQuestions:
-                                                _numberOfQuestions.text)));
-                              }),
-                        ]));
+            if (_words.length < 5) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content:
+                    Text('To play games, you have to add at least 5 words!'),
+              ));
+            } else {
+              showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                          title: const Text(
+                              "How many words do you wanna play with?"),
+                          content: TextField(
+                            controller: _numberOfQuestions,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                                child: const Text("Play"),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FindTheWord(
+                                              deckId: widget.deckId,
+                                              deckName: widget.deckName,
+                                              numberOfQuestions:
+                                                  _numberOfQuestions.text)));
+                                }),
+                          ]));
+            }
           },
           label: 'Play "Find the word"',
           labelStyle:
@@ -241,32 +248,39 @@ class _DeckDetailState extends State<DeckDetail> {
           child: const Icon(Icons.view_comfy, color: Colors.white),
           backgroundColor: Colors.green[800],
           onTap: () {
-            showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                        title: const Text(
-                            "How many words do you wanna play with?"),
-                        content: TextField(
-                          controller: _numberOfQuestions,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                              child: const Text("Play"),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => FindTranslation(
-                                            deckId: widget.deckId,
-                                            deckName: widget.deckName,
-                                            numberOfQuestions:
-                                                _numberOfQuestions.text)));
-                              }),
-                        ]));
+            if (_words.length < 5) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content:
+                    Text('To play games, you have to add at least 5 words!'),
+              ));
+            } else {
+              showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                          title: const Text(
+                              "How many words do you wanna play with?"),
+                          content: TextField(
+                            controller: _numberOfQuestions,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                                child: const Text("Play"),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FindTranslation(
+                                              deckId: widget.deckId,
+                                              deckName: widget.deckName,
+                                              numberOfQuestions:
+                                                  _numberOfQuestions.text)));
+                                }),
+                          ]));
+            }
           },
           label: 'Play "Find the translation"',
           labelStyle:
