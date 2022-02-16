@@ -1,7 +1,6 @@
 import 'package:flashcards_app/quiz_find_the_word.dart';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -28,23 +27,23 @@ class _DeckDetailState extends State<DeckDetail> {
   List<Map<String, dynamic>> _words = [];
   List<Map<String, dynamic>> _subDecks = [];
   bool _isLoading = true;
-  int nrOfQuestions = 50;
+  int _numberOfQuestions = 10;
+
   final FlutterTts tts = FlutterTts();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _wordController = TextEditingController();
   final TextEditingController _translationController = TextEditingController();
-  final TextEditingController _numberOfQuestions = TextEditingController();
 
   void _refreshDecks() async {
-    final mainDeck =
-        await DatabaseHelper.getDictionary(int.parse(widget.deckId));
+    final deck = await DatabaseHelper.getDictionary(int.parse(widget.deckId));
     final data = await DatabaseHelper.getWords(widget.deckName);
     final subDecksData = await DatabaseHelper.getSubDictionaries();
     setState(() {
-      _mainDeck = mainDeck;
+      _mainDeck = deck;
       _words = data;
       _subDecks = subDecksData;
       _isLoading = false;
+      _numberOfQuestions = _mainDeck[0]["numberOfWordsToLearn"];
     });
   }
 
@@ -52,9 +51,6 @@ class _DeckDetailState extends State<DeckDetail> {
   void initState() {
     super.initState();
     _refreshDecks();
-    //nrOfQuestions = _mainDeck[0]["numberOfWordsToLearn"] > 0
-    //    ? _mainDeck[0]["numberOfWordsToLearn"]
-    //   : 10;
   }
 
   void _showSubDeckForm() async {
@@ -209,32 +205,13 @@ class _DeckDetailState extends State<DeckDetail> {
                     Text('To play games, you have to add at least 5 words!'),
               ));
             } else {
-              showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                          title: const Text(
-                              "How many words do you wanna play with?"),
-                          content: TextField(
-                            controller: _numberOfQuestions,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                                child: const Text("Play"),
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => FindTheWord(
-                                              deckId: widget.deckId,
-                                              deckName: widget.deckName,
-                                              numberOfQuestions:
-                                                  _numberOfQuestions.text)));
-                                }),
-                          ]));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => FindTheWord(
+                          deckId: widget.deckId,
+                          deckName: widget.deckName,
+                          numberOfQuestions: _numberOfQuestions.toString())));
             }
           },
           label: 'Play "Find the word"',
@@ -252,32 +229,13 @@ class _DeckDetailState extends State<DeckDetail> {
                     Text('To play games, you have to add at least 5 words!'),
               ));
             } else {
-              showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                          title: const Text(
-                              "How many words do you wanna play with?"),
-                          content: TextField(
-                            controller: _numberOfQuestions,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                                child: const Text("Play"),
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => FindTranslation(
-                                              deckId: widget.deckId,
-                                              deckName: widget.deckName,
-                                              numberOfQuestions:
-                                                  _numberOfQuestions.text)));
-                                }),
-                          ]));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => FindTranslation(
+                          deckId: widget.deckId,
+                          deckName: widget.deckName,
+                          numberOfQuestions: _numberOfQuestions.toString())));
             }
           },
           label: 'Play "Find the translation"',
@@ -377,7 +335,7 @@ class _DeckDetailState extends State<DeckDetail> {
     _refreshDecks();
   }
 
-  _changeNumberOfQuestions(int numberOfQuestions) async {
+  Future<void> _changeNumberOfQuestions(int numberOfQuestions) async {
     await DatabaseHelper.updateDictionary(
         int.parse(widget.deckId), widget.deckName, numberOfQuestions);
     _refreshDecks();
@@ -411,18 +369,18 @@ class _DeckDetailState extends State<DeckDetail> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   ElevatedButton(
-                    child: Text(nrOfQuestions == 10 ? '10' : '10'),
+                    child: Text(_numberOfQuestions == 10 ? '10' : '10'),
                     style: ElevatedButton.styleFrom(
-                      primary: nrOfQuestions == 10
+                      primary: _numberOfQuestions == 10
                           ? Colors.teal
                           : null, // This is what you need!
                     ),
                     onPressed: () => _changeNumberOfQuestions(10),
                   ),
                   ElevatedButton(
-                    child: Text(nrOfQuestions == 30 ? '30' : '30'),
+                    child: Text(_numberOfQuestions == 30 ? '30' : '30'),
                     style: ElevatedButton.styleFrom(
-                      primary: nrOfQuestions == 30
+                      primary: _numberOfQuestions == 30
                           ? Colors.teal
                           : null, // This is what you need!
                     ),
@@ -431,9 +389,9 @@ class _DeckDetailState extends State<DeckDetail> {
                     },
                   ),
                   ElevatedButton(
-                    child: Text(nrOfQuestions == 50 ? '50' : '50'),
+                    child: Text(_numberOfQuestions == 50 ? '50' : '50'),
                     style: ElevatedButton.styleFrom(
-                      primary: nrOfQuestions == 50
+                      primary: _numberOfQuestions == 50
                           ? Colors.teal
                           : null, // This is what you need!
                     ),
