@@ -105,7 +105,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _updateDict(int id) async {
-    await DatabaseHelper.updateDictionary(id, _nameController.text);
+    await DatabaseHelper.updateDictionary(
+        id, _nameController.text, _decks[0]['numberOfWordsToLearn']);
     _refreshDecks();
   }
 

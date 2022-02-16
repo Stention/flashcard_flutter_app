@@ -5,7 +5,10 @@ class DatabaseHelper {
   static const dictionary = """CREATE TABLE dictionary(
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        name TEXT
+        name TEXT,
+        numberOfWordsToLearn TINYINT NOT NULL DEFAULT 10,
+        fromLanguage TEXT,
+        toLanguage TEXT
       );
       """;
   static const subDictionary = """CREATE TABLE sub_dictionary(
@@ -35,7 +38,7 @@ class DatabaseHelper {
        """;
 
   static Future<sql.Database> db() async {
-    // await sql.deleteDatabase('demo_database.db');
+    //await sql.deleteDatabase('demo_database.db');
     return sql.openDatabase(
       'demo_database.db',
       version: 1,
@@ -66,9 +69,14 @@ class DatabaseHelper {
     return db.query('dictionary', where: "id = ?", whereArgs: [id], limit: 1);
   }
 
-  static Future<int> updateDictionary(int id, String name) async {
+  static Future<int> updateDictionary(
+      int id, String name, int numberOfWordsToLearn) async {
     final db = await DatabaseHelper.db();
-    final data = {'name': name, 'createdAt': DateTime.now().toString()};
+    final data = {
+      'name': name,
+      'createdAt': DateTime.now().toString(),
+      'numberOfWordsToLearn': numberOfWordsToLearn
+    };
     final result =
         await db.update('dictionary', data, where: "id = ?", whereArgs: [id]);
     return result;

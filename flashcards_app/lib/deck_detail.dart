@@ -24,10 +24,11 @@ class DeckDetail extends StatefulWidget {
 }
 
 class _DeckDetailState extends State<DeckDetail> {
+  List<Map<String, dynamic>> _mainDeck = [];
   List<Map<String, dynamic>> _words = [];
   List<Map<String, dynamic>> _subDecks = [];
   bool _isLoading = true;
-  // bool _isPlaying = false;
+  int nrOfQuestions = 50;
   final FlutterTts tts = FlutterTts();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _wordController = TextEditingController();
@@ -35,9 +36,12 @@ class _DeckDetailState extends State<DeckDetail> {
   final TextEditingController _numberOfQuestions = TextEditingController();
 
   void _refreshDecks() async {
+    final mainDeck =
+        await DatabaseHelper.getDictionary(int.parse(widget.deckId));
     final data = await DatabaseHelper.getWords(widget.deckName);
     final subDecksData = await DatabaseHelper.getSubDictionaries();
     setState(() {
+      _mainDeck = mainDeck;
       _words = data;
       _subDecks = subDecksData;
       _isLoading = false;
@@ -48,12 +52,10 @@ class _DeckDetailState extends State<DeckDetail> {
   void initState() {
     super.initState();
     _refreshDecks();
+    //nrOfQuestions = _mainDeck[0]["numberOfWordsToLearn"] > 0
+    //    ? _mainDeck[0]["numberOfWordsToLearn"]
+    //   : 10;
   }
-
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  // }
 
   void _showSubDeckForm() async {
     showModalBottomSheet(
@@ -171,7 +173,7 @@ class _DeckDetailState extends State<DeckDetail> {
             ));
   }
 
-  SpeedDial _buildWordsSpeedDial() {
+  SpeedDial _buildSpeedDial() {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
       animatedIconTheme: const IconThemeData(size: 28.0),
@@ -183,7 +185,7 @@ class _DeckDetailState extends State<DeckDetail> {
           child: const Icon(Icons.add, color: Colors.white),
           backgroundColor: Colors.green[800],
           onTap: () => _showSubDeckForm(),
-          label: 'subdeck',
+          label: 'add subdeck',
           labelStyle:
               const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
           labelBackgroundColor: Colors.black,
@@ -192,23 +194,11 @@ class _DeckDetailState extends State<DeckDetail> {
           child: const Icon(Icons.add, color: Colors.white),
           backgroundColor: Colors.black,
           onTap: () => _showWordForm(null),
-          label: 'word',
+          label: 'add word',
           labelStyle:
               const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
           labelBackgroundColor: Colors.black,
         ),
-      ],
-    );
-  }
-
-  SpeedDial _buildMenuSpeedDial() {
-    return SpeedDial(
-      animatedIcon: AnimatedIcons.menu_close,
-      animatedIconTheme: const IconThemeData(size: 28.0),
-      backgroundColor: Colors.grey[800],
-      visible: true,
-      curve: Curves.bounceInOut,
-      children: [
         SpeedDialChild(
           child: const Icon(Icons.verified_rounded, color: Colors.white),
           backgroundColor: Colors.black,
@@ -291,24 +281,6 @@ class _DeckDetailState extends State<DeckDetail> {
             }
           },
           label: 'Play "Find the translation"',
-          labelStyle:
-              const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
-          labelBackgroundColor: Colors.black,
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.upload, color: Colors.white),
-          backgroundColor: Colors.black,
-          onTap: () => _uploadCsvFile(),
-          label: 'upload file',
-          labelStyle:
-              const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
-          labelBackgroundColor: Colors.black,
-        ),
-        SpeedDialChild(
-          child: const Icon(Icons.download, color: Colors.white),
-          backgroundColor: Colors.black,
-          onTap: () => _generateCsvFile(),
-          label: 'download',
           labelStyle:
               const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
           labelBackgroundColor: Colors.black,
@@ -405,97 +377,192 @@ class _DeckDetailState extends State<DeckDetail> {
     _refreshDecks();
   }
 
+  _changeNumberOfQuestions(int numberOfQuestions) async {
+    await DatabaseHelper.updateDictionary(
+        int.parse(widget.deckId), widget.deckName, numberOfQuestions);
+    _refreshDecks();
+  }
+
   @override
   Widget build(BuildContext context) {
     tts.setLanguage('fr-CA');
     tts.setSpeechRate(0.5);
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Text(widget.deckName,
-              style: const TextStyle(
-                  color: Colors.purple, fontWeight: FontWeight.bold)),
-          leading: IconButton(
-            color: Colors.black,
-            icon: const Icon(Icons.chevron_left),
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const HomePage())),
-          )),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Stack(
-              children: <Widget>[
-                SingleChildScrollView(
-                  physics: const ScrollPhysics(),
-                  child: Column(
-                    children: <Widget>[
-                      ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: _subDecks.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return ExpansionTile(
-                              title: Text(_subDecks[index]['name']),
-                              subtitle: const Text('number of words'),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              trailing: IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () =>
-                                      _deleteSubDeck(_subDecks[index]['id'])),
-                              children: const <Widget>[
-                                ListTile(title: Text('word')),
-                              ],
-                            );
-                          }),
-                      ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: _words.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-                                leading: Text(_words[index]["word"] +
-                                    '   --->   ' +
-                                    _words[index]["translation"] +
-                                    '   ( ' +
-                                    _words[index]["level"].toString() +
-                                    ' )'),
-                                trailing: SizedBox(
-                                  width: 150,
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                          icon:
-                                              const Icon(Icons.surround_sound),
-                                          onPressed: () =>
-                                              tts.speak(_words[index]["word"])),
-                                      IconButton(
-                                          icon: const Icon(Icons.edit),
-                                          onPressed: () =>
-                                              _showWordForm(index)),
-                                      IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () =>
-                                              _deleteWord(_words[index]['id'])),
-                                    ],
-                                  ),
-                                ),
-                                onTap: () {});
-                          }),
-                    ],
+        endDrawer: Drawer(
+            child: ListView(padding: EdgeInsets.zero, children: [
+          const DrawerHeader(
+              child: Text("Menu",
+                  style: TextStyle(
+                      color: Colors.purple, fontWeight: FontWeight.bold)),
+              decoration: BoxDecoration(color: Colors.black)),
+          ListTile(
+            title: const Text('Upload Words file'),
+            onTap: () => _uploadCsvFile(),
+          ),
+          ListTile(
+            title: const Text('Download Words file'),
+            onTap: () => _generateCsvFile(),
+          ),
+          const ListTile(
+            title: Text('How many words you want to learn?'),
+          ),
+          ListTile(
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  ElevatedButton(
+                    child: Text(nrOfQuestions == 10 ? '10' : '10'),
+                    style: ElevatedButton.styleFrom(
+                      primary: nrOfQuestions == 10
+                          ? Colors.teal
+                          : null, // This is what you need!
+                    ),
+                    onPressed: () => _changeNumberOfQuestions(10),
                   ),
-                ),
-              ],
-            ),
-      //  floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
-      floatingActionButton: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Row(children: [_buildMenuSpeedDial(), _buildWordsSpeedDial()])
-          ]),
-    );
+                  ElevatedButton(
+                    child: Text(nrOfQuestions == 30 ? '30' : '30'),
+                    style: ElevatedButton.styleFrom(
+                      primary: nrOfQuestions == 30
+                          ? Colors.teal
+                          : null, // This is what you need!
+                    ),
+                    onPressed: () {
+                      _changeNumberOfQuestions(30);
+                    },
+                  ),
+                  ElevatedButton(
+                    child: Text(nrOfQuestions == 50 ? '50' : '50'),
+                    style: ElevatedButton.styleFrom(
+                      primary: nrOfQuestions == 50
+                          ? Colors.teal
+                          : null, // This is what you need!
+                    ),
+                    onPressed: () {
+                      _changeNumberOfQuestions(50);
+                    },
+                  )
+                ]),
+          ),
+          const ListTile(
+            title: Text('Choose languages'),
+          ),
+          ListTile(
+            title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  DropdownButton<String>(
+                    items: <String>[
+                      'Czech',
+                      'English',
+                      'Fench',
+                      'German',
+                      'Italian',
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (_) {},
+                  ),
+                  DropdownButton<String>(
+                    items: <String>[
+                      'Czech',
+                      'English',
+                      'Fench',
+                      'German',
+                      'Italian',
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (_) {},
+                  ),
+                ]),
+          ),
+        ])),
+        appBar: AppBar(
+            backgroundColor: Colors.white,
+            iconTheme: const IconThemeData(color: Colors.black),
+            title: Text(widget.deckName,
+                style: const TextStyle(
+                    color: Colors.purple, fontWeight: FontWeight.bold)),
+            leading: IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const HomePage())),
+            )),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Stack(
+                children: <Widget>[
+                  SingleChildScrollView(
+                    physics: const ScrollPhysics(),
+                    child: Column(
+                      children: <Widget>[
+                        ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: _subDecks.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return ExpansionTile(
+                                title: Text(_subDecks[index]['name']),
+                                subtitle: const Text('number of words'),
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                trailing: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () =>
+                                        _deleteSubDeck(_subDecks[index]['id'])),
+                                children: const <Widget>[
+                                  ListTile(title: Text('word')),
+                                ],
+                              );
+                            }),
+                        ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: _words.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return ListTile(
+                                  leading: Text(_words[index]["word"] +
+                                      '   --->   ' +
+                                      _words[index]["translation"] +
+                                      '   ( ' +
+                                      _words[index]["level"].toString() +
+                                      ' )'),
+                                  trailing: SizedBox(
+                                    width: 150,
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                            icon: const Icon(
+                                                Icons.surround_sound),
+                                            onPressed: () => tts
+                                                .speak(_words[index]["word"])),
+                                        IconButton(
+                                            icon: const Icon(Icons.edit),
+                                            onPressed: () =>
+                                                _showWordForm(index)),
+                                        IconButton(
+                                            icon: const Icon(Icons.delete),
+                                            onPressed: () => _deleteWord(
+                                                _words[index]['id'])),
+                                      ],
+                                    ),
+                                  ),
+                                  onTap: () {});
+                            }),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+        //  floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
+        floatingActionButton: _buildSpeedDial());
   }
 }
