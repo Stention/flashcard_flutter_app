@@ -7,8 +7,7 @@ class DatabaseHelper {
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         name TEXT,
         numberOfWordsToLearn TINYINT NOT NULL DEFAULT 10,
-        fromLanguage TEXT,
-        toLanguage TEXT
+        targetLanguage TEXT
       );
       """;
   static const subDictionary = """CREATE TABLE sub_dictionary(
@@ -75,7 +74,17 @@ class DatabaseHelper {
     final data = {
       'name': name,
       'createdAt': DateTime.now().toString(),
-      'numberOfWordsToLearn': numberOfWordsToLearn
+      'numberOfWordsToLearn': numberOfWordsToLearn,
+    };
+    final result =
+        await db.update('dictionary', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
+
+  static Future<int> changeTargetLanguage(int id, String targetLanguage) async {
+    final db = await DatabaseHelper.db();
+    final data = {
+      'targetLanguage': targetLanguage,
     };
     final result =
         await db.update('dictionary', data, where: "id = ?", whereArgs: [id]);
@@ -147,29 +156,34 @@ class DatabaseHelper {
 
 // words
   static Future<int> createWord(String word, String translation,
-      String dictionaryId, String dictionaryName,
-      [subDictionaryName]) async {
+      String dictionaryId, String dictionaryName) async {
     final db = await DatabaseHelper.db();
     final data = {
       'word': word,
       'translation': translation,
       'dictionary_id': dictionaryId,
       'dictionary_name': dictionaryName,
-      'sub_dictionary_name': subDictionaryName
     };
     final id = await db.insert("words_pairs", data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
   }
 
-  static Future<int> updateWord(int id, String word, String translation,
-      [subDictionaryName]) async {
+  static Future<int> updateWord(int id, String word, String translation) async {
     final db = await DatabaseHelper.db();
     final data = {
       'word': word,
       'translation': translation,
-      'sub_dictionary_name': subDictionaryName
     };
+    final result =
+        await db.update("words_pairs", data, where: 'id=?', whereArgs: [id]);
+    return result;
+  }
+
+  static Future<int> changeWordsSubdeck(
+      int id, String subDictionaryName) async {
+    final db = await DatabaseHelper.db();
+    final data = {'sub_dictionary_name': subDictionaryName};
     final result =
         await db.update("words_pairs", data, where: 'id=?', whereArgs: [id]);
     return result;
@@ -186,6 +200,15 @@ class DatabaseHelper {
     return db.query('words_pairs',
         where: "dictionary_name = ?",
         whereArgs: [dictionaryName],
+        orderBy: "id");
+  }
+
+  static Future<List<Map<String, dynamic>>> getWordsInSubdeck(
+      String subDictionaryName) async {
+    final db = await DatabaseHelper.db();
+    return db.query('words_pairs',
+        where: "sub_dictionary_name = ?",
+        whereArgs: [subDictionaryName],
         orderBy: "id");
   }
 

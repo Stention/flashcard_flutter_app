@@ -25,25 +25,54 @@ class DeckDetail extends StatefulWidget {
 class _DeckDetailState extends State<DeckDetail> {
   List<Map<String, dynamic>> _mainDeck = [];
   List<Map<String, dynamic>> _words = [];
+  final Map<String, List> _wordsInSubdeck = {};
   List<Map<String, dynamic>> _subDecks = [];
+  static final Map<String, String> _languageMap = {
+    'Czech': 'cs-CZ',
+    'English': 'en-US',
+    'French': 'fr-CA',
+    'German': 'de-DE',
+    'Italian': 'it-IT',
+  };
   bool _isLoading = true;
   int _numberOfQuestions = 10;
+  String _targetLanguage = '';
+  // List _listOfLanguages = [];
+  //List _listOfVoices = [];
 
   final FlutterTts tts = FlutterTts();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _wordController = TextEditingController();
   final TextEditingController _translationController = TextEditingController();
+  final TextEditingController _subDeckNameController = TextEditingController();
 
   void _refreshDecks() async {
     final deck = await DatabaseHelper.getDictionary(int.parse(widget.deckId));
     final data = await DatabaseHelper.getWords(widget.deckName);
     final subDecksData = await DatabaseHelper.getSubDictionaries();
+    if (subDecksData.isNotEmpty) {
+      for (int i = 0; i < subDecksData.length; i++) {
+        String name = subDecksData[i]['name'];
+        List subWords = await DatabaseHelper.getWordsInSubdeck(name);
+        _wordsInSubdeck[name] = subWords;
+      }
+    }
+
+    //  List<String> languages = await tts.getLanguages;
+    // List<dynamic> voices = await tts.getVoices;
     setState(() {
       _mainDeck = deck;
       _words = data;
       _subDecks = subDecksData;
       _isLoading = false;
       _numberOfQuestions = _mainDeck[0]["numberOfWordsToLearn"];
+      if (_mainDeck[0]["targetLanguage"] == null) {
+        _targetLanguage = '';
+      } else {
+        _targetLanguage = _mainDeck[0]["targetLanguage"];
+      }
+      //    _listOfLanguages = languages;
+      //_listOfVoices = voices;
     });
   }
 
@@ -101,6 +130,8 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   void _showWordForm(int? id) async {
+    int index = _words.indexWhere((w) => w['id'] == id);
+    var word = _words[index];
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -117,7 +148,7 @@ class _DeckDetailState extends State<DeckDetail> {
                     TextField(
                       controller: _wordController,
                       decoration: InputDecoration(
-                        hintText: id == null ? 'word' : _words[id]['word'],
+                        hintText: id == null ? 'word' : word['word'],
                         focusedBorder: const OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
@@ -130,9 +161,23 @@ class _DeckDetailState extends State<DeckDetail> {
                     TextField(
                       controller: _translationController,
                       decoration: InputDecoration(
+                        hintText:
+                            id == null ? 'translation' : word['translation'],
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 2.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextField(
+                      controller: _subDeckNameController,
+                      decoration: InputDecoration(
                         hintText: id == null
-                            ? 'translation'
-                            : _words[id]['translation'],
+                            ? 'subdeck name'
+                            : word['sub_dictionary_name'],
                         focusedBorder: const OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
@@ -157,9 +202,11 @@ class _DeckDetailState extends State<DeckDetail> {
                         }
                         if (id != null) {
                           await _updateWord(id);
+                          await _updateWordsSubdeck(id);
                         }
                         _wordController.text = '';
                         _translationController.text = '';
+                        _subDeckNameController.text = '';
                         Navigator.of(context).pop();
                       },
                     ),
@@ -330,6 +377,11 @@ class _DeckDetailState extends State<DeckDetail> {
     _refreshDecks();
   }
 
+  Future<void> _updateWordsSubdeck(int id) async {
+    await DatabaseHelper.changeWordsSubdeck(id, _subDeckNameController.text);
+    _refreshDecks();
+  }
+
   Future<void> _deleteWord(int id) async {
     await DatabaseHelper.deleteWord(id);
     _refreshDecks();
@@ -341,9 +393,15 @@ class _DeckDetailState extends State<DeckDetail> {
     _refreshDecks();
   }
 
+  Future<void> _changeTargetLanguage(String targetLanguage) async {
+    await DatabaseHelper.changeTargetLanguage(
+        int.parse(widget.deckId), targetLanguage);
+    _refreshDecks();
+  }
+
   @override
   Widget build(BuildContext context) {
-    tts.setLanguage('fr-CA');
+    tts.setLanguage(_targetLanguage);
     tts.setSpeechRate(0.5);
     return Scaffold(
         endDrawer: Drawer(
@@ -402,17 +460,18 @@ class _DeckDetailState extends State<DeckDetail> {
                 ]),
           ),
           const ListTile(
-            title: Text('Choose languages'),
+            title: Text('Choose target language'),
           ),
           ListTile(
             title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   DropdownButton<String>(
+                    hint: Text(_targetLanguage.toString()),
                     items: <String>[
                       'Czech',
                       'English',
-                      'Fench',
+                      'French',
                       'German',
                       'Italian',
                     ].map((String value) {
@@ -421,22 +480,10 @@ class _DeckDetailState extends State<DeckDetail> {
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: (_) {},
-                  ),
-                  DropdownButton<String>(
-                    items: <String>[
-                      'Czech',
-                      'English',
-                      'Fench',
-                      'German',
-                      'Italian',
-                    ].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (_) {},
+                    onChanged: (value) {
+                      String? language = _languageMap[value];
+                      _changeTargetLanguage(language.toString());
+                    },
                   ),
                 ]),
           ),
@@ -467,6 +514,8 @@ class _DeckDetailState extends State<DeckDetail> {
                             shrinkWrap: true,
                             itemCount: _subDecks.length,
                             itemBuilder: (BuildContext context, int index) {
+                              List? wordsInSubdeck =
+                                  _wordsInSubdeck[_subDecks[index]['name']];
                               return ExpansionTile(
                                 title: Text(_subDecks[index]['name']),
                                 subtitle: const Text('number of words'),
@@ -476,8 +525,20 @@ class _DeckDetailState extends State<DeckDetail> {
                                     icon: const Icon(Icons.delete),
                                     onPressed: () =>
                                         _deleteSubDeck(_subDecks[index]['id'])),
-                                children: const <Widget>[
-                                  ListTile(title: Text('word')),
+                                children: <Widget>[
+                                  ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: wordsInSubdeck != null
+                                          ? wordsInSubdeck.length
+                                          : 0,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return ListTile(
+                                            title: Text(wordsInSubdeck![index]
+                                                ["word"]));
+                                      })
                                 ],
                               );
                             }),
@@ -504,8 +565,8 @@ class _DeckDetailState extends State<DeckDetail> {
                                                 .speak(_words[index]["word"])),
                                         IconButton(
                                             icon: const Icon(Icons.edit),
-                                            onPressed: () =>
-                                                _showWordForm(index)),
+                                            onPressed: () => _showWordForm(
+                                                _words[index]['id'])),
                                         IconButton(
                                             icon: const Icon(Icons.delete),
                                             onPressed: () => _deleteWord(
