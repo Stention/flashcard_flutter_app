@@ -516,72 +516,145 @@ class _DeckDetailState extends State<DeckDetail> {
                             itemBuilder: (BuildContext context, int index) {
                               List? wordsInSubdeck =
                                   _wordsInSubdeck[_subDecks[index]['name']];
-                              return ExpansionTile(
-                                title: Text(_subDecks[index]['name']),
-                                subtitle: const Text('number of words'),
-                                controlAffinity:
-                                    ListTileControlAffinity.leading,
-                                trailing: IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () =>
-                                        _deleteSubDeck(_subDecks[index]['id'])),
-                                children: <Widget>[
-                                  ListView.builder(
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: wordsInSubdeck != null
-                                          ? wordsInSubdeck.length
-                                          : 0,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return ListTile(
-                                            title: Text(wordsInSubdeck![index]
-                                                ["word"]));
-                                      })
-                                ],
-                              );
+                              return DragTarget(builder:
+                                  (context, candidateItems, rejectedItems) {
+                                return ExpansionTile(
+                                  title: Text(_subDecks[index]['name']),
+                                  subtitle: Text(
+                                      (wordsInSubdeck?.length).toString() +
+                                          ' word(s)'),
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  trailing: IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () => _deleteSubDeck(
+                                          _subDecks[index]['id'])),
+                                  children: <Widget>[
+                                    ListView.builder(
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: wordsInSubdeck != null
+                                            ? wordsInSubdeck.length
+                                            : 0,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return ListTile(
+                                              title: Text(wordsInSubdeck![index]
+                                                      ["word"] +
+                                                  '   --->   ' +
+                                                  wordsInSubdeck[index]
+                                                      ["translation"] +
+                                                  '   ( ' +
+                                                  wordsInSubdeck[index]["level"]
+                                                      .toString() +
+                                                  ' )'),
+                                              trailing: SizedBox(
+                                                width: 150,
+                                                child: Row(
+                                                  children: [
+                                                    IconButton(
+                                                        icon: const Icon(Icons
+                                                            .surround_sound),
+                                                        onPressed: () =>
+                                                            tts.speak(
+                                                                wordsInSubdeck[
+                                                                        index]
+                                                                    ["word"])),
+                                                    IconButton(
+                                                        icon: const Icon(
+                                                            Icons.edit),
+                                                        onPressed: () =>
+                                                            _showWordForm(
+                                                                wordsInSubdeck[
+                                                                        index]
+                                                                    ['id'])),
+                                                    IconButton(
+                                                        icon: const Icon(
+                                                            Icons.delete),
+                                                        onPressed: () =>
+                                                            _deleteWord(
+                                                                wordsInSubdeck[
+                                                                        index]
+                                                                    ['id'])),
+                                                  ],
+                                                ),
+                                              ),
+                                              onTap: () {});
+                                        })
+                                  ],
+                                );
+                              }, onAccept: (item) {
+                                debugPrint("Hello");
+                              });
                             }),
                         ListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: _words.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                  leading: Text(_words[index]["word"] +
-                                      '   --->   ' +
-                                      _words[index]["translation"] +
-                                      '   ( ' +
-                                      _words[index]["level"].toString() +
-                                      ' )'),
-                                  trailing: SizedBox(
-                                    width: 150,
-                                    child: Row(
-                                      children: [
-                                        IconButton(
-                                            icon: const Icon(
-                                                Icons.surround_sound),
-                                            onPressed: () => tts
-                                                .speak(_words[index]["word"])),
-                                        IconButton(
-                                            icon: const Icon(Icons.edit),
-                                            onPressed: () => _showWordForm(
-                                                _words[index]['id'])),
-                                        IconButton(
-                                            icon: const Icon(Icons.delete),
-                                            onPressed: () => _deleteWord(
-                                                _words[index]['id'])),
-                                      ],
-                                    ),
-                                  ),
-                                  onTap: () {});
+                              return Draggable(
+                                  child: SizedBox(
+                                      width: 350,
+                                      height: 50,
+                                      child: ListTile(
+                                          leading: Text(_words[index]["word"] +
+                                              '   --->   ' +
+                                              _words[index]["translation"] +
+                                              '   ( ' +
+                                              _words[index]["level"]
+                                                  .toString() +
+                                              ' )'),
+                                          trailing: SizedBox(
+                                            width: 150,
+                                            child: Row(
+                                              children: [
+                                                IconButton(
+                                                    icon: const Icon(
+                                                        Icons.surround_sound),
+                                                    onPressed: () => tts.speak(
+                                                        _words[index]["word"])),
+                                                IconButton(
+                                                    icon:
+                                                        const Icon(Icons.edit),
+                                                    onPressed: () =>
+                                                        _showWordForm(
+                                                            _words[index]
+                                                                ['id'])),
+                                                IconButton(
+                                                    icon: const Icon(
+                                                        Icons.delete),
+                                                    onPressed: () =>
+                                                        _deleteWord(
+                                                            _words[index]
+                                                                ['id'])),
+                                              ],
+                                            ),
+                                          ),
+                                          onTap: () {})),
+                                  feedback: Material(
+                                      child: Container(
+                                          width: 300,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.blueAccent)),
+                                          child: ListTile(
+                                            leading: Text(_words[index]
+                                                    ["word"] +
+                                                '   --->   ' +
+                                                _words[index]["translation"] +
+                                                '   ( ' +
+                                                _words[index]["level"]
+                                                    .toString() +
+                                                ' )'),
+                                          ))));
                             }),
                       ],
                     ),
                   ),
                 ],
               ),
-        //  floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
         floatingActionButton: _buildSpeedDial());
   }
 }
