@@ -50,7 +50,8 @@ class _DeckDetailState extends State<DeckDetail> {
   void _refreshDecks() async {
     final deck = await DatabaseHelper.getDictionary(int.parse(widget.deckId));
     final data = await DatabaseHelper.getWords(widget.deckName);
-    final subDecksData = await DatabaseHelper.getSubDictionaries();
+    final subDecksData =
+        await DatabaseHelper.getSubDictionaries(widget.deckName);
     if (subDecksData.isNotEmpty) {
       for (int i = 0; i < subDecksData.length; i++) {
         String name = subDecksData[i]['name'];
@@ -131,8 +132,6 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   void _showWordForm(int? id) async {
-    int index = _words.indexWhere((w) => w['id'] == id);
-    var word = _words[index];
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -149,7 +148,10 @@ class _DeckDetailState extends State<DeckDetail> {
                     TextField(
                       controller: _wordController,
                       decoration: InputDecoration(
-                        hintText: id == null ? 'word' : word['word'],
+                        hintText: id == null
+                            ? 'word'
+                            : _words[_words.indexWhere((w) => w['id'] == id)]
+                                ['word'],
                         focusedBorder: const OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
@@ -162,8 +164,10 @@ class _DeckDetailState extends State<DeckDetail> {
                     TextField(
                       controller: _translationController,
                       decoration: InputDecoration(
-                        hintText:
-                            id == null ? 'translation' : word['translation'],
+                        hintText: id == null
+                            ? 'translation'
+                            : _words[_words.indexWhere((w) => w['id'] == id)]
+                                ['translation'],
                         focusedBorder: const OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
@@ -389,7 +393,7 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _changeNumberOfQuestions(int numberOfQuestions) async {
-    await DatabaseHelper.updateDictionary(
+    await DatabaseHelper.updateDictionaryDeckDetail(
         int.parse(widget.deckId), widget.deckName, numberOfQuestions);
     _refreshDecks();
   }
@@ -540,48 +544,77 @@ class _DeckDetailState extends State<DeckDetail> {
                                             : 0,
                                         itemBuilder:
                                             (BuildContext context, int index) {
-                                          return ListTile(
-                                              title: Text(wordsInSubdeck![index]
-                                                      ["word"] +
-                                                  '   --->   ' +
-                                                  wordsInSubdeck[index]
-                                                      ["translation"] +
-                                                  '   ( ' +
-                                                  wordsInSubdeck[index]["level"]
-                                                      .toString() +
-                                                  ' )'),
-                                              trailing: SizedBox(
-                                                width: 150,
-                                                child: Row(
-                                                  children: [
-                                                    IconButton(
-                                                        icon: const Icon(Icons
-                                                            .surround_sound),
-                                                        onPressed: () =>
-                                                            tts.speak(
-                                                                wordsInSubdeck[
-                                                                        index]
-                                                                    ["word"])),
-                                                    IconButton(
-                                                        icon: const Icon(
-                                                            Icons.edit),
-                                                        onPressed: () =>
-                                                            _showWordForm(
-                                                                wordsInSubdeck[
-                                                                        index]
-                                                                    ['id'])),
-                                                    IconButton(
-                                                        icon: const Icon(
-                                                            Icons.delete),
-                                                        onPressed: () =>
-                                                            _deleteWord(
-                                                                wordsInSubdeck[
-                                                                        index]
-                                                                    ['id'])),
-                                                  ],
+                                          return Draggable(
+                                            data: wordsInSubdeck![index]["id"],
+                                            child: ListTile(
+                                                title: Text(
+                                                    wordsInSubdeck[index]
+                                                            ["word"] +
+                                                        '   --->   ' +
+                                                        wordsInSubdeck[index]
+                                                            ["translation"] +
+                                                        '   ( ' +
+                                                        wordsInSubdeck[index]
+                                                                ["level"]
+                                                            .toString() +
+                                                        ' )'),
+                                                trailing: SizedBox(
+                                                  width: 150,
+                                                  child: Row(
+                                                    children: [
+                                                      IconButton(
+                                                          icon: const Icon(Icons
+                                                              .surround_sound),
+                                                          onPressed: () =>
+                                                              tts.speak(
+                                                                  wordsInSubdeck[
+                                                                          index]
+                                                                      [
+                                                                      "word"])),
+                                                      IconButton(
+                                                          icon: const Icon(
+                                                              Icons.edit),
+                                                          onPressed: () =>
+                                                              _showWordForm(
+                                                                  wordsInSubdeck[
+                                                                          index]
+                                                                      ['id'])),
+                                                      IconButton(
+                                                          icon: const Icon(
+                                                              Icons.delete),
+                                                          onPressed: () =>
+                                                              _deleteWord(
+                                                                  wordsInSubdeck[
+                                                                          index]
+                                                                      ['id'])),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              onTap: () {});
+                                                onTap: () {}),
+                                            feedback: Material(
+                                                child: Container(
+                                                    width: 300,
+                                                    height: 50,
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: Colors
+                                                                .blueAccent)),
+                                                    child: ListTile(
+                                                      leading: Text(
+                                                          wordsInSubdeck[index]
+                                                                  ["word"] +
+                                                              '   --->   ' +
+                                                              wordsInSubdeck[
+                                                                      index][
+                                                                  "translation"] +
+                                                              '   ( ' +
+                                                              wordsInSubdeck[
+                                                                          index]
+                                                                      ["level"]
+                                                                  .toString() +
+                                                              ' )'),
+                                                    ))),
+                                          );
                                         })
                                   ],
                                 );
@@ -592,69 +625,84 @@ class _DeckDetailState extends State<DeckDetail> {
                                 });
                               });
                             }),
-                        ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: _words.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Draggable(
-                                  data: _words[index]["id"],
-                                  child: SizedBox(
-                                      width: 350,
-                                      height: 50,
-                                      child: ListTile(
-                                          leading: Text(_words[index]["word"] +
-                                              '   --->   ' +
-                                              _words[index]["translation"] +
-                                              '   ( ' +
-                                              _words[index]["level"]
-                                                  .toString() +
-                                              ' )'),
-                                          trailing: SizedBox(
-                                            width: 150,
-                                            child: Row(
-                                              children: [
-                                                IconButton(
-                                                    icon: const Icon(
-                                                        Icons.surround_sound),
-                                                    onPressed: () => tts.speak(
-                                                        _words[index]["word"])),
-                                                IconButton(
-                                                    icon:
-                                                        const Icon(Icons.edit),
-                                                    onPressed: () =>
-                                                        _showWordForm(
-                                                            _words[index]
-                                                                ['id'])),
-                                                IconButton(
-                                                    icon: const Icon(
-                                                        Icons.delete),
-                                                    onPressed: () =>
-                                                        _deleteWord(
-                                                            _words[index]
-                                                                ['id'])),
-                                              ],
-                                            ),
-                                          ),
-                                          onTap: () {})),
-                                  feedback: Material(
-                                      child: Container(
-                                          width: 300,
+                        DragTarget<int>(
+                            builder: (context, data, rejectedItems) {
+                          return SizedBox(
+                            width: 400.0,
+                            height: MediaQuery.of(context).size.height,
+                            child: ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: _words.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Draggable(
+                                      data: _words[index]["id"],
+                                      child: SizedBox(
+                                          width: 350,
                                           height: 50,
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.blueAccent)),
                                           child: ListTile(
-                                            leading: Text(_words[index]
-                                                    ["word"] +
-                                                '   --->   ' +
-                                                _words[index]["translation"] +
-                                                '   ( ' +
-                                                _words[index]["level"]
-                                                    .toString() +
-                                                ' )'),
-                                          ))));
-                            }),
+                                              leading: Text(_words[index]
+                                                      ["word"] +
+                                                  '   --->   ' +
+                                                  _words[index]["translation"] +
+                                                  '   ( ' +
+                                                  _words[index]["level"]
+                                                      .toString() +
+                                                  ' )'),
+                                              trailing: SizedBox(
+                                                width: 150,
+                                                child: Row(
+                                                  children: [
+                                                    IconButton(
+                                                        icon: const Icon(Icons
+                                                            .surround_sound),
+                                                        onPressed: () => tts
+                                                            .speak(_words[index]
+                                                                ["word"])),
+                                                    IconButton(
+                                                        icon: const Icon(
+                                                            Icons.edit),
+                                                        onPressed: () =>
+                                                            _showWordForm(
+                                                                _words[index]
+                                                                    ['id'])),
+                                                    IconButton(
+                                                        icon: const Icon(
+                                                            Icons.delete),
+                                                        onPressed: () =>
+                                                            _deleteWord(
+                                                                _words[index]
+                                                                    ['id'])),
+                                                  ],
+                                                ),
+                                              ),
+                                              onTap: () {})),
+                                      feedback: Material(
+                                          child: Container(
+                                              width: 300,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color:
+                                                          Colors.blueAccent)),
+                                              child: ListTile(
+                                                leading: Text(_words[index]
+                                                        ["word"] +
+                                                    '   --->   ' +
+                                                    _words[index]
+                                                        ["translation"] +
+                                                    '   ( ' +
+                                                    _words[index]["level"]
+                                                        .toString() +
+                                                    ' )'),
+                                              ))));
+                                }),
+                          );
+                        }, onAccept: (data) {
+                          setState(() {
+                            _addWordToSubdeck(data, '');
+                          });
+                        }),
                       ],
                     ),
                   ),

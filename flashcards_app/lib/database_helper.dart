@@ -16,7 +16,7 @@ class DatabaseHelper {
         name TEXT,
         dictionary_id INTEGER NOT NULL,
         dictionary_name TEXT NOT NULL,
-        FOREIGN KEY (dictionary_id) REFERENCES dictionary (id)
+        FOREIGN KEY (dictionary_id) REFERENCES dictionary (id)  
         FOREIGN KEY (dictionary_name) REFERENCES dictionary (name)  
       );
       """;
@@ -29,9 +29,9 @@ class DatabaseHelper {
          dictionary_name TEXT NOT NULL,
          sub_dictionary_id INTEGER,
          sub_dictionary_name TEXT,
-         FOREIGN KEY (dictionary_id) REFERENCES dictionary (id)
+         FOREIGN KEY (dictionary_id) REFERENCES dictionary (id)  
          FOREIGN KEY (dictionary_name) REFERENCES dictionary (name)
-         FOREIGN KEY (sub_dictionary_id) REFERENCES sub_dictionary (id)
+         FOREIGN KEY (sub_dictionary_id) REFERENCES sub_dictionary (id) 
          FOREIGN KEY (sub_dictionary_name) REFERENCES sub_dictionary (name)       
        );
        """;
@@ -68,7 +68,18 @@ class DatabaseHelper {
     return db.query('dictionary', where: "id = ?", whereArgs: [id], limit: 1);
   }
 
-  static Future<int> updateDictionary(
+  static Future<int> updateDictionary(int id, String name) async {
+    final db = await DatabaseHelper.db();
+    final data = {
+      'name': name,
+      'createdAt': DateTime.now().toString(),
+    };
+    final result =
+        await db.update('dictionary', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
+
+  static Future<int> updateDictionaryDeckDetail(
       int id, String name, int numberOfWordsToLearn) async {
     final db = await DatabaseHelper.db();
     final data = {
@@ -94,19 +105,11 @@ class DatabaseHelper {
   static Future<void> deleteDictionary(int id) async {
     final db = await DatabaseHelper.db();
     try {
+      await db
+          .delete("words_pairs", where: "dictionary_id = ?", whereArgs: [id]);
+      await db.delete("sub_dictionary",
+          where: "dictionary_id = ?", whereArgs: [id]);
       await db.delete("dictionary", where: "id = ?", whereArgs: [id]);
-      await db.query("sub_dictionary",
-                  where: "dictionary_id = ?", whereArgs: [id]) ==
-              []
-          ? await db.delete("sub_dictionary",
-              where: "dictionary_id = ?", whereArgs: [id])
-          : null;
-      await db.query("words_pairs",
-                  where: "dictionary_id = ?", whereArgs: [id]) ==
-              []
-          ? await db.delete("words_pairs",
-              where: "dictionary_id = ?", whereArgs: [id])
-          : null;
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -126,9 +129,13 @@ class DatabaseHelper {
     return id;
   }
 
-  static Future<List<Map<String, dynamic>>> getSubDictionaries() async {
+  static Future<List<Map<String, dynamic>>> getSubDictionaries(
+      String dictionaryName) async {
     final db = await DatabaseHelper.db();
-    return db.query('sub_dictionary', orderBy: "id");
+    return db.query('sub_dictionary',
+        where: "dictionary_name = ?",
+        whereArgs: [dictionaryName],
+        orderBy: "id");
   }
 
   static Future<int> updateSubDictionary(int id, String name) async {
@@ -198,7 +205,8 @@ class DatabaseHelper {
       String dictionaryName) async {
     final db = await DatabaseHelper.db();
     return db.query('words_pairs',
-        where: "dictionary_name = ?",
+        where:
+            "dictionary_name = ? and (sub_dictionary_name is NULL or sub_dictionary_name = '')",
         whereArgs: [dictionaryName],
         orderBy: "id");
   }
