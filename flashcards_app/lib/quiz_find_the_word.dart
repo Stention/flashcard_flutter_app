@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import "database_helper.dart";
 
 class FindTheWord extends StatefulWidget {
-  final String deckId;
+  final int deckId;
   final String deckName;
   final String numberOfQuestions;
   const FindTheWord(

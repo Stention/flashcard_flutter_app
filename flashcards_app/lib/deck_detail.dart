@@ -8,6 +8,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:io';
 import 'dart:convert' show utf8;
 import "database_helper.dart";
+import 'find_the_word_2.dart';
 import 'main.dart';
 import 'quiz_find_the_word.dart';
 import 'quiz_find_translation.dart';
@@ -16,7 +17,7 @@ import 'generate_csv_file.dart';
 class DeckDetail extends StatefulWidget {
   const DeckDetail({Key? key, required this.deckId, required this.deckName})
       : super(key: key);
-  final String deckId;
+  final int deckId;
   final String deckName;
 
   @override
@@ -48,7 +49,7 @@ class _DeckDetailState extends State<DeckDetail> {
   // final TextEditingController _subDeckNameController = TextEditingController();
 
   void _refreshDecks() async {
-    final deck = await DatabaseHelper.getDictionary(int.parse(widget.deckId));
+    final deck = await DatabaseHelper.getMainDeck(widget.deckId);
     final data = await DatabaseHelper.getWords(widget.deckName);
     final subDecksData =
         await DatabaseHelper.getSubDictionaries(widget.deckName);
@@ -251,10 +252,10 @@ class _DeckDetailState extends State<DeckDetail> {
           child: const Icon(Icons.verified_rounded, color: Colors.white),
           backgroundColor: Colors.black,
           onTap: () {
-            if (_words.length < 5) {
+            if (_words.length < 10) {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content:
-                    Text('To play games, you have to add at least 5 words!'),
+                    Text('To play games, you have to add at least 10 words!'),
               ));
             } else {
               Navigator.push(
@@ -275,10 +276,10 @@ class _DeckDetailState extends State<DeckDetail> {
           child: const Icon(Icons.view_comfy, color: Colors.white),
           backgroundColor: Colors.green[800],
           onTap: () {
-            if (_words.length < 5) {
+            if (_words.length < 10) {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content:
-                    Text('To play games, you have to add at least 5 words!'),
+                    Text('To play games, you have to add at least 10 words!'),
               ));
             } else {
               Navigator.push(
@@ -343,7 +344,7 @@ class _DeckDetailState extends State<DeckDetail> {
 
       for (List wordPair in words) {
         await DatabaseHelper.createWord(
-            widget.deckId, widget.deckName, wordPair[0], wordPair[1]);
+            wordPair[0], wordPair[1], widget.deckId, widget.deckName);
       }
     }
     _refreshDecks();
@@ -354,7 +355,7 @@ class _DeckDetailState extends State<DeckDetail> {
 
   Future<void> _addSubdeck() async {
     await DatabaseHelper.createSubDictionary(
-        _nameController.text, int.parse(widget.deckId), widget.deckName);
+        _nameController.text, widget.deckId, widget.deckName);
     _refreshDecks();
   }
 
@@ -393,14 +394,13 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _changeNumberOfQuestions(int numberOfQuestions) async {
-    await DatabaseHelper.updateDictionaryDeckDetail(
-        int.parse(widget.deckId), widget.deckName, numberOfQuestions);
+    await DatabaseHelper.updateMainDeckWordsNumber(
+        widget.deckId, widget.deckName, numberOfQuestions);
     _refreshDecks();
   }
 
   Future<void> _changeTargetLanguage(String targetLanguage) async {
-    await DatabaseHelper.changeTargetLanguage(
-        int.parse(widget.deckId), targetLanguage);
+    await DatabaseHelper.changeTargetLanguage(widget.deckId, targetLanguage);
     _refreshDecks();
   }
 
@@ -530,10 +530,44 @@ class _DeckDetailState extends State<DeckDetail> {
                                           ' word(s)'),
                                   controlAffinity:
                                       ListTileControlAffinity.leading,
-                                  trailing: IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () => _deleteSubDeck(
-                                          _subDecks[index]['id'])),
+                                  trailing: SizedBox(
+                                    width: 150,
+                                    child: Row(children: [
+                                      IconButton(
+                                          icon: const Icon(
+                                              Icons.verified_rounded),
+                                          onPressed: () {
+                                            if (wordsInSubdeck!.length < 10) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                content: Text(
+                                                    'To play games, you have to add at least 10 words!'),
+                                              ));
+                                            } else {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          FindTheWord2(
+                                                              deckId:
+                                                                  widget.deckId,
+                                                              deckName: widget
+                                                                  .deckName,
+                                                              questions:
+                                                                  wordsInSubdeck,
+                                                              numberOfQuestions:
+                                                                  _numberOfQuestions)));
+                                            }
+                                          }),
+                                      IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () {}),
+                                      IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () => _deleteSubDeck(
+                                              _subDecks[index]['id'])),
+                                    ]),
+                                  ),
                                   children: <Widget>[
                                     ListView.builder(
                                         physics:

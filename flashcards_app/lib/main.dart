@@ -25,15 +25,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Map<String, dynamic>> _decks = [];
+  List<Map<String, dynamic>> _mainDecks = [];
   bool _isLoading = true;
 
   final TextEditingController _nameController = TextEditingController();
 
   void _refreshDecks() async {
-    final data = await DatabaseHelper.getDictionaries();
+    final data = await DatabaseHelper.getMainDecks();
     setState(() {
-      _decks = data;
+      _mainDecks = data;
       _isLoading = false;
     });
   }
@@ -44,9 +44,27 @@ class _HomePageState extends State<HomePage> {
     _refreshDecks();
   }
 
+  Future<void> _addDeck() async {
+    await DatabaseHelper.createMainDeck(_nameController.text);
+    _refreshDecks();
+  }
+
+  Future<void> _updateDeck(int id) async {
+    await DatabaseHelper.updateMainDeck(id, _nameController.text);
+    _refreshDecks();
+  }
+
+  void _deleteDeck(int id) async {
+    await DatabaseHelper.deleteMainDeck(id);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Successfully deleted a deck!'),
+    ));
+    _refreshDecks();
+  }
+
   void _showForm(int? id) async {
     if (id != null) {
-      final existingDeck = _decks.firstWhere((deck) => deck['id'] == id);
+      final existingDeck = _mainDecks.firstWhere((deck) => deck['id'] == id);
       _nameController.text = existingDeck['name'];
     }
     showModalBottomSheet(
@@ -65,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                     TextField(
                       controller: _nameController,
                       decoration: const InputDecoration(
-                        hintText: 'Name',
+                        hintText: 'Deck name',
                         focusedBorder: OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
@@ -85,10 +103,10 @@ class _HomePageState extends State<HomePage> {
                               MaterialStateProperty.all(Colors.black)),
                       onPressed: () async {
                         if (id == null) {
-                          await _addDict();
+                          await _addDeck();
                         }
                         if (id != null) {
-                          await _updateDict(id);
+                          await _updateDeck(id);
                         }
                         _nameController.text = '';
                         Navigator.of(context).pop();
@@ -98,24 +116,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ));
-  }
-
-  Future<void> _addDict() async {
-    await DatabaseHelper.createDictionary(_nameController.text);
-    _refreshDecks();
-  }
-
-  Future<void> _updateDict(int id) async {
-    await DatabaseHelper.updateDictionary(id, _nameController.text);
-    _refreshDecks();
-  }
-
-  void _deleteDict(int id) async {
-    await DatabaseHelper.deleteDictionary(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Successfully deleted a deck!'),
-    ));
-    _refreshDecks();
   }
 
   @override
@@ -131,12 +131,12 @@ class _HomePageState extends State<HomePage> {
               child: CircularProgressIndicator(),
             )
           : ListView.builder(
-              itemCount: _decks.length,
+              itemCount: _mainDecks.length,
               itemBuilder: (BuildContext context, int index) => Card(
                 color: Colors.grey[800],
                 margin: const EdgeInsets.all(15),
                 child: ListTile(
-                    title: Text(_decks[index]['name'],
+                    title: Text(_mainDecks[index]['name'],
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                     trailing: SizedBox(
@@ -145,11 +145,12 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.white),
-                            onPressed: () => _showForm(_decks[index]['id']),
+                            onPressed: () => _showForm(_mainDecks[index]['id']),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.white),
-                            onPressed: () => _deleteDict(_decks[index]['id']),
+                            onPressed: () =>
+                                _deleteDeck(_mainDecks[index]['id']),
                           ),
                         ],
                       ),
@@ -159,8 +160,8 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => DeckDetail(
-                                deckId: _decks[index]['id'].toString(),
-                                deckName: _decks[index]['name'])),
+                                deckId: _mainDecks[index]['id'],
+                                deckName: _mainDecks[index]['name'])),
                       );
                     }),
               ),

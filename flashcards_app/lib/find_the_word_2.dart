@@ -4,14 +4,16 @@ import "dart:math";
 import 'package:collection/collection.dart';
 import "database_helper.dart";
 
-class FindTranslation extends StatefulWidget {
+class FindTheWord2 extends StatefulWidget {
   final int deckId;
   final String deckName;
-  final String numberOfQuestions;
-  const FindTranslation(
+  final List questions;
+  final int numberOfQuestions;
+  const FindTheWord2(
       {Key? key,
       required this.deckId,
       required this.deckName,
+      required this.questions,
       required this.numberOfQuestions})
       : super(key: key);
 
@@ -21,15 +23,17 @@ class FindTranslation extends StatefulWidget {
   }
 }
 
-class _QuizState extends State<FindTranslation> {
-  List<Map<String, dynamic>> _allWordsPool = [];
-  List<Map<String, dynamic>> _gameWordsPool = [];
+class _QuizState extends State<FindTheWord2> {
+  List<dynamic> _allWordsPool = [];
+  List<dynamic> _gameWordsPool = [];
   int _numberOfQuestions = 0;
 
   Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-            title: const Text("Do you want to exit the game?"),
+            title: const Text(
+              "Do you want to exit the game?",
+            ),
             actions: [
               ElevatedButton(
                   child: const Text("Yes",
@@ -54,8 +58,8 @@ class _QuizState extends State<FindTranslation> {
       );
 
   void _createWordsPool() async {
-    final data = await DatabaseHelper.getWords(widget.deckName);
-    final numberOfQuestions = int.parse(widget.numberOfQuestions);
+    final data = widget.questions;
+    final numberOfQuestions = widget.numberOfQuestions;
     setState(() {
       _allWordsPool = data;
       _numberOfQuestions = numberOfQuestions;
@@ -81,9 +85,8 @@ class _QuizState extends State<FindTranslation> {
       List answers = [];
       while (answers.length < 3) {
         var word = _allWordsPool[_random.nextInt(_allWordsPool.length)];
-        if (word["translation"] != correctAnswer &&
-            !answers.contains(word["translation"])) {
-          answers.add(word["translation"]);
+        if (word["word"] != correctAnswer && !answers.contains(word["word"])) {
+          answers.add(word["word"]);
         }
       }
       return answers;
@@ -99,13 +102,14 @@ class _QuizState extends State<FindTranslation> {
   @override
   Widget build(BuildContext context) {
     var question = _question(_gameWordsPool);
-    var correctAnswer = question != null ? question["translation"] : "no data";
+    var correctAnswer = question != null ? question["word"] : "no question";
     var answers = _answers(_allWordsPool, correctAnswer);
-    question != null ? answers.add(question["translation"]) : "no data";
+    question != null ? answers.add(question["word"]) : "no answer";
+    answers.shuffle();
 
     var appBar = AppBar(
         backgroundColor: Colors.black,
-        title: const Text("Select the right translation",
+        title: const Text("Select the right word",
             style:
                 TextStyle(color: Colors.white, fontWeight: FontWeight.bold)));
 
@@ -139,7 +143,9 @@ class _QuizState extends State<FindTranslation> {
                   width: MediaQuery.of(context).size.width,
                   child: Center(
                       child: Text(
-                          question != null ? question["word"] : "no data",
+                          question != null
+                              ? question["translation"]
+                              : "no translation",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
@@ -159,13 +165,14 @@ class _QuizState extends State<FindTranslation> {
                               style: const TextStyle(
                                   fontSize: 20.0, color: Colors.white)),
                           onPressed: () {
-                            if (question["translation"] == answers[index]) {
+                            if (question["word"] == answers[index]) {
                               debugPrint("Correct");
                               _updateLevel(
                                   question["id"], question["level"], "correct");
                               finalScore++;
                               _gameWordsPool.removeWhere((answer) =>
-                                  answer["word"] == question["word"]);
+                                  answer["translation"] ==
+                                  question["translation"]);
                             } else {
                               debugPrint("False");
                               _updateLevel(
@@ -188,10 +195,11 @@ class _QuizState extends State<FindTranslation> {
         showModalBottomSheet<void>(
             context: context,
             builder: (context) => Summary(
-                score: finalScore,
-                deckId: widget.deckId,
-                deckName: widget.deckName,
-                numberOfQuestions: _numberOfQuestions));
+                  score: finalScore,
+                  deckId: widget.deckId,
+                  deckName: widget.deckName,
+                  numberOfQuestions: _numberOfQuestions,
+                ));
       } else {
         questionNumber++;
       }

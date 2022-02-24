@@ -50,7 +50,7 @@ class DatabaseHelper {
   }
 
 // dictionary
-  static Future<int> createDictionary(String name) async {
+  static Future<int> createMainDeck(String name) async {
     final db = await DatabaseHelper.db();
     final data = {'name': name};
     final id = await db.insert("dictionary", data,
@@ -58,17 +58,17 @@ class DatabaseHelper {
     return id;
   }
 
-  static Future<List<Map<String, dynamic>>> getDictionaries() async {
+  static Future<List<Map<String, dynamic>>> getMainDecks() async {
     final db = await DatabaseHelper.db();
     return db.query('dictionary', orderBy: "id");
   }
 
-  static Future<List<Map<String, dynamic>>> getDictionary(int id) async {
+  static Future<List<Map<String, dynamic>>> getMainDeck(int id) async {
     final db = await DatabaseHelper.db();
     return db.query('dictionary', where: "id = ?", whereArgs: [id], limit: 1);
   }
 
-  static Future<int> updateDictionary(int id, String name) async {
+  static Future<int> updateMainDeck(int id, String name) async {
     final db = await DatabaseHelper.db();
     final data = {
       'name': name,
@@ -79,7 +79,7 @@ class DatabaseHelper {
     return result;
   }
 
-  static Future<int> updateDictionaryDeckDetail(
+  static Future<int> updateMainDeckWordsNumber(
       int id, String name, int numberOfWordsToLearn) async {
     final db = await DatabaseHelper.db();
     final data = {
@@ -102,7 +102,7 @@ class DatabaseHelper {
     return result;
   }
 
-  static Future<void> deleteDictionary(int id) async {
+  static Future<void> deleteMainDeck(int id) async {
     final db = await DatabaseHelper.db();
     try {
       await db
@@ -150,12 +150,8 @@ class DatabaseHelper {
     final db = await DatabaseHelper.db();
     try {
       await db.delete("sub_dictionary", where: "id = ?", whereArgs: [id]);
-      await db.query("words_pairs",
-                  where: "sub_dictionary_id = ?", whereArgs: [id]) ==
-              []
-          ? await db.delete("words_pairs",
-              where: "sub_dictionary_id = ?", whereArgs: [id])
-          : null;
+      await db.delete("words_pairs",
+          where: "sub_dictionary_id = ?", whereArgs: [id]);
     } catch (err) {
       debugPrint("Something went wrong when deleting a sub_dictionary: $err");
     }
@@ -163,7 +159,7 @@ class DatabaseHelper {
 
 // words
   static Future<int> createWord(String word, String translation,
-      String dictionaryId, String dictionaryName) async {
+      int dictionaryId, String dictionaryName) async {
     final db = await DatabaseHelper.db();
     final data = {
       'word': word,

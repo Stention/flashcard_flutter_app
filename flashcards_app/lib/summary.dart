@@ -7,7 +7,7 @@ var questionNumber = 0;
 class Summary extends StatelessWidget {
   final int score;
   final int numberOfQuestions;
-  final String deckId;
+  final int deckId;
   final String deckName;
   const Summary(
       {Key? key,
