@@ -1,4 +1,3 @@
-import 'package:flashcards_app/quiz_find_the_word.dart';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -8,9 +7,8 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:io';
 import 'dart:convert' show utf8;
 import "database_helper.dart";
-import 'find_the_word_2.dart';
-import 'main.dart';
 import 'quiz_find_the_word.dart';
+import 'main.dart';
 import 'quiz_find_translation.dart';
 import 'generate_csv_file.dart';
 
@@ -46,13 +44,11 @@ class _DeckDetailState extends State<DeckDetail> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _wordController = TextEditingController();
   final TextEditingController _translationController = TextEditingController();
-  // final TextEditingController _subDeckNameController = TextEditingController();
 
   void _refreshDecks() async {
     final deck = await DatabaseHelper.getMainDeck(widget.deckId);
     final data = await DatabaseHelper.getWords(widget.deckName);
-    final subDecksData =
-        await DatabaseHelper.getSubDictionaries(widget.deckName);
+    final subDecksData = await DatabaseHelper.getSubDecks(widget.deckName);
     if (subDecksData.isNotEmpty) {
       for (int i = 0; i < subDecksData.length; i++) {
         String name = subDecksData[i]['name'];
@@ -178,18 +174,6 @@ class _DeckDetailState extends State<DeckDetail> {
                     const SizedBox(
                       height: 10,
                     ),
-                    //      TextField(
-                    //      controller: _subDeckNameController,
-                    //     decoration: InputDecoration(
-                    //      hintText: id == null
-                    //         ? 'subdeck name'
-                    //        : word['sub_dictionary_name'],
-                    //   focusedBorder: const OutlineInputBorder(
-                    //    borderSide:
-                    //       BorderSide(color: Colors.black, width: 2.0),
-                    //  ),
-                    //   ),
-                    //  ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -208,11 +192,9 @@ class _DeckDetailState extends State<DeckDetail> {
                         }
                         if (id != null) {
                           await _updateWord(id);
-                          //  await _addWordToSubdeck(id);
                         }
                         _wordController.text = '';
                         _translationController.text = '';
-                        //   _subDeckNameController.text = '';
                         Navigator.of(context).pop();
                       },
                     ),
@@ -264,7 +246,8 @@ class _DeckDetailState extends State<DeckDetail> {
                       builder: (context) => FindTheWord(
                           deckId: widget.deckId,
                           deckName: widget.deckName,
-                          numberOfQuestions: _numberOfQuestions.toString())));
+                          questions: _words,
+                          numberOfQuestions: _numberOfQuestions)));
             }
           },
           label: 'Play "Find the word"',
@@ -288,7 +271,8 @@ class _DeckDetailState extends State<DeckDetail> {
                       builder: (context) => FindTranslation(
                           deckId: widget.deckId,
                           deckName: widget.deckName,
-                          numberOfQuestions: _numberOfQuestions.toString())));
+                          questions: _words,
+                          numberOfQuestions: _numberOfQuestions)));
             }
           },
           label: 'Play "Find the translation"',
@@ -354,7 +338,7 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _addSubdeck() async {
-    await DatabaseHelper.createSubDictionary(
+    await DatabaseHelper.createSubDeck(
         _nameController.text, widget.deckId, widget.deckName);
     _refreshDecks();
   }
@@ -434,18 +418,14 @@ class _DeckDetailState extends State<DeckDetail> {
                   ElevatedButton(
                     child: Text(_numberOfQuestions == 10 ? '10' : '10'),
                     style: ElevatedButton.styleFrom(
-                      primary: _numberOfQuestions == 10
-                          ? Colors.teal
-                          : null, // This is what you need!
+                      primary: _numberOfQuestions == 10 ? Colors.teal : null,
                     ),
                     onPressed: () => _changeNumberOfQuestions(10),
                   ),
                   ElevatedButton(
                     child: Text(_numberOfQuestions == 30 ? '30' : '30'),
                     style: ElevatedButton.styleFrom(
-                      primary: _numberOfQuestions == 30
-                          ? Colors.teal
-                          : null, // This is what you need!
+                      primary: _numberOfQuestions == 30 ? Colors.teal : null,
                     ),
                     onPressed: () {
                       _changeNumberOfQuestions(30);
@@ -454,9 +434,7 @@ class _DeckDetailState extends State<DeckDetail> {
                   ElevatedButton(
                     child: Text(_numberOfQuestions == 50 ? '50' : '50'),
                     style: ElevatedButton.styleFrom(
-                      primary: _numberOfQuestions == 50
-                          ? Colors.teal
-                          : null, // This is what you need!
+                      primary: _numberOfQuestions == 50 ? Colors.teal : null,
                     ),
                     onPressed: () {
                       _changeNumberOfQuestions(50);
@@ -548,7 +526,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          FindTheWord2(
+                                                          FindTheWord(
                                                               deckId:
                                                                   widget.deckId,
                                                               deckName: widget

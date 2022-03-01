@@ -25,10 +25,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final TextEditingController _nameController = TextEditingController();
   List<Map<String, dynamic>> _mainDecks = [];
   bool _isLoading = true;
 
-  final TextEditingController _nameController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _refreshDecks();
+  }
 
   void _refreshDecks() async {
     final data = await DatabaseHelper.getMainDecks();
@@ -36,12 +41,6 @@ class _HomePageState extends State<HomePage> {
       _mainDecks = data;
       _isLoading = false;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshDecks();
   }
 
   Future<void> _addDeck() async {
@@ -60,62 +59,6 @@ class _HomePageState extends State<HomePage> {
       content: Text('Successfully deleted a deck!'),
     ));
     _refreshDecks();
-  }
-
-  void _showForm(int? id) async {
-    if (id != null) {
-      final existingDeck = _mainDecks.firstWhere((deck) => deck['id'] == id);
-      _nameController.text = existingDeck['name'];
-    }
-    showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        elevation: 5,
-        builder: (_) => Container(
-              padding: const EdgeInsets.all(15),
-              width: double.infinity,
-              height: 300,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Deck name',
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2.0),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ElevatedButton(
-                      child: Text(id == null ? 'Create New' : 'Update',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.black)),
-                      onPressed: () async {
-                        if (id == null) {
-                          await _addDeck();
-                        }
-                        if (id != null) {
-                          await _updateDeck(id);
-                        }
-                        _nameController.text = '';
-                        Navigator.of(context).pop();
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ));
   }
 
   @override
@@ -172,5 +115,61 @@ class _HomePageState extends State<HomePage> {
         onPressed: () => _showForm(null),
       ),
     );
+  }
+
+  void _showForm(int? id) async {
+    if (id != null) {
+      final existingDeck = _mainDecks.firstWhere((deck) => deck['id'] == id);
+      _nameController.text = existingDeck['name'];
+    }
+    showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        elevation: 5,
+        builder: (_) => Container(
+              padding: const EdgeInsets.all(15),
+              width: double.infinity,
+              height: 300,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    TextField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Deck name',
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 2.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton(
+                      child: Text(id == null ? 'Create New' : 'Update',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black)),
+                      onPressed: () async {
+                        if (id == null) {
+                          await _addDeck();
+                        }
+                        if (id != null) {
+                          await _updateDeck(id);
+                        }
+                        _nameController.text = '';
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ));
   }
 }

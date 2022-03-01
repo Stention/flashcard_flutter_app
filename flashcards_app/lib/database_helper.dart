@@ -116,7 +116,7 @@ class DatabaseHelper {
   }
 
 // sub_dictionary
-  static Future<int> createSubDictionary(
+  static Future<int> createSubDeck(
       String name, int dictionaryId, String dictionaryName) async {
     final db = await DatabaseHelper.db();
     final data = {
@@ -129,7 +129,7 @@ class DatabaseHelper {
     return id;
   }
 
-  static Future<List<Map<String, dynamic>>> getSubDictionaries(
+  static Future<List<Map<String, dynamic>>> getSubDecks(
       String dictionaryName) async {
     final db = await DatabaseHelper.db();
     return db.query('sub_dictionary',

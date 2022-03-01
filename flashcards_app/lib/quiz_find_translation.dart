@@ -7,11 +7,13 @@ import "database_helper.dart";
 class FindTranslation extends StatefulWidget {
   final int deckId;
   final String deckName;
-  final String numberOfQuestions;
+  final List questions;
+  final int numberOfQuestions;
   const FindTranslation(
       {Key? key,
       required this.deckId,
       required this.deckName,
+      required this.questions,
       required this.numberOfQuestions})
       : super(key: key);
 
@@ -22,8 +24,8 @@ class FindTranslation extends StatefulWidget {
 }
 
 class _QuizState extends State<FindTranslation> {
-  List<Map<String, dynamic>> _allWordsPool = [];
-  List<Map<String, dynamic>> _gameWordsPool = [];
+  List<dynamic> _allWordsPool = [];
+  List<dynamic> _gameWordsPool = [];
   int _numberOfQuestions = 0;
 
   Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
@@ -54,8 +56,8 @@ class _QuizState extends State<FindTranslation> {
       );
 
   void _createWordsPool() async {
-    final data = await DatabaseHelper.getWords(widget.deckName);
-    final numberOfQuestions = int.parse(widget.numberOfQuestions);
+    final data = widget.questions;
+    final numberOfQuestions = widget.numberOfQuestions;
     setState(() {
       _allWordsPool = data;
       _numberOfQuestions = numberOfQuestions;
@@ -188,10 +190,11 @@ class _QuizState extends State<FindTranslation> {
         showModalBottomSheet<void>(
             context: context,
             builder: (context) => Summary(
-                score: finalScore,
-                deckId: widget.deckId,
-                deckName: widget.deckName,
-                numberOfQuestions: _numberOfQuestions));
+                  score: finalScore,
+                  deckId: widget.deckId,
+                  deckName: widget.deckName,
+                  numberOfQuestions: _numberOfQuestions,
+                ));
       } else {
         questionNumber++;
       }
