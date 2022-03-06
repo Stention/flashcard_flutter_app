@@ -202,6 +202,16 @@ class DatabaseHelper {
     final db = await DatabaseHelper.db();
     return db.query('words_pairs',
         where:
+            "dictionary_name = ?", //and (sub_dictionary_name is NULL or sub_dictionary_name = '')",
+        whereArgs: [dictionaryName],
+        orderBy: "id");
+  }
+
+  static Future<List<Map<String, dynamic>>> getWordsWithoutSubdeck(
+      String dictionaryName) async {
+    final db = await DatabaseHelper.db();
+    return db.query('words_pairs',
+        where:
             "dictionary_name = ? and (sub_dictionary_name is NULL or sub_dictionary_name = '')",
         whereArgs: [dictionaryName],
         orderBy: "id");

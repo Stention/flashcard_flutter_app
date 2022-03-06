@@ -25,6 +25,8 @@ class DeckDetail extends StatefulWidget {
 class _DeckDetailState extends State<DeckDetail> {
   List<Map<String, dynamic>> _mainDeck = [];
   List<Map<String, dynamic>> _words = [];
+  List<Map<String, dynamic>> _wordsWithoutSubdeck = [];
+
   final Map<String, List> _wordsInSubdeck = {};
   List<Map<String, dynamic>> _subDecks = [];
   static final Map<String, String> _languageMap = {
@@ -48,6 +50,8 @@ class _DeckDetailState extends State<DeckDetail> {
   void _refreshDecks() async {
     final deck = await DatabaseHelper.getMainDeck(widget.deckId);
     final data = await DatabaseHelper.getWords(widget.deckName);
+    final wordsWithoutSubdeck =
+        await DatabaseHelper.getWordsWithoutSubdeck(widget.deckName);
     final subDecksData = await DatabaseHelper.getSubDecks(widget.deckName);
     if (subDecksData.isNotEmpty) {
       for (int i = 0; i < subDecksData.length; i++) {
@@ -62,6 +66,7 @@ class _DeckDetailState extends State<DeckDetail> {
     setState(() {
       _mainDeck = deck;
       _words = data;
+      _wordsWithoutSubdeck = wordsWithoutSubdeck;
       _subDecks = subDecksData;
       _isLoading = false;
       _numberOfQuestions = _mainDeck[0]["numberOfWordsToLearn"];
@@ -81,7 +86,12 @@ class _DeckDetailState extends State<DeckDetail> {
     _refreshDecks();
   }
 
-  void _showSubDeckForm() async {
+  void _showSubDeckForm(int? id) async {
+    if (id != null) {
+      final existingDeck =
+          _subDecks.firstWhere((subdeck) => subdeck['id'] == id);
+      _nameController.text = existingDeck['name'];
+    }
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -98,7 +108,7 @@ class _DeckDetailState extends State<DeckDetail> {
                     TextField(
                       controller: _nameController,
                       decoration: const InputDecoration(
-                        hintText: 'name of a subdeck',
+                        hintText: 'Subdeck name',
                         focusedBorder: OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
@@ -108,20 +118,46 @@ class _DeckDetailState extends State<DeckDetail> {
                     const SizedBox(
                       height: 10,
                     ),
-                    ElevatedButton(
-                      child: const Text("Add a new subdeck",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.black)),
-                      onPressed: () async {
-                        await _addSubdeck();
-                        _nameController.text = '';
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            child: Text(
+                                id == null
+                                    ? 'Create New Subdeck'
+                                    : 'Update the Subdeck',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.black)),
+                            onPressed: () async {
+                              if (id == null) {
+                                await _addSubdeck();
+                              }
+                              if (id != null) {
+                                await _updateSubdeck(id);
+                              }
+                              _nameController.text = '';
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ElevatedButton(
+                            child: Text(
+                                id == null ? "Nix" : "Delet the subdeck",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.red)),
+                            onPressed: () async {
+                              id == null ? 0 : _deleteSubDeck(id);
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ]),
                   ],
                 ),
               ),
@@ -177,27 +213,48 @@ class _DeckDetailState extends State<DeckDetail> {
                     const SizedBox(
                       height: 10,
                     ),
-                    ElevatedButton(
-                      child: Text(
-                          id == null ? "Add a new word" : 'Update the word',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.black)),
-                      onPressed: () async {
-                        if (id == null) {
-                          await _addWord();
-                        }
-                        if (id != null) {
-                          await _updateWord(id);
-                        }
-                        _wordController.text = '';
-                        _translationController.text = '';
-                        Navigator.of(context).pop();
-                      },
-                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            child: Text(
+                                id == null
+                                    ? "Add a new word"
+                                    : 'Update the word',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.black)),
+                            onPressed: () async {
+                              if (id == null) {
+                                await _addWord();
+                              }
+                              if (id != null) {
+                                await _updateWord(id);
+                              }
+                              _wordController.text = '';
+                              _translationController.text = '';
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ElevatedButton(
+                            child: Text(id == null ? "Nix" : 'Delete the word',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.red)),
+                            onPressed: () async {
+                              id ??
+                                  _deleteWord(_words[_words
+                                      .indexWhere((w) => w['id'] == id)]['id']);
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        ]),
                   ],
                 ),
               ),
@@ -215,7 +272,7 @@ class _DeckDetailState extends State<DeckDetail> {
         SpeedDialChild(
           child: const Icon(Icons.add, color: Colors.white),
           backgroundColor: Colors.green[800],
-          onTap: () => _showSubDeckForm(),
+          onTap: () => _showSubDeckForm(null),
           label: 'add subdeck',
           labelStyle:
               const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
@@ -340,6 +397,11 @@ class _DeckDetailState extends State<DeckDetail> {
   Future<void> _addSubdeck() async {
     await DatabaseHelper.createSubDeck(
         _nameController.text, widget.deckId, widget.deckName);
+    _refreshDecks();
+  }
+
+  Future<void> _updateSubdeck(int id) async {
+    await DatabaseHelper.updateSubDictionary(id, _nameController.text);
     _refreshDecks();
   }
 
@@ -499,6 +561,7 @@ class _DeckDetailState extends State<DeckDetail> {
                             itemBuilder: (BuildContext context, int index) {
                               List? wordsInSubdeck =
                                   _wordsInSubdeck[_subDecks[index]['name']];
+
                               return DragTarget<int>(
                                   builder: (context, data, rejectedItems) {
                                 return ExpansionTile(
@@ -509,7 +572,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                   controlAffinity:
                                       ListTileControlAffinity.leading,
                                   trailing: SizedBox(
-                                    width: 150,
+                                    width: 100,
                                     child: Row(children: [
                                       IconButton(
                                           icon: const Icon(
@@ -538,12 +601,10 @@ class _DeckDetailState extends State<DeckDetail> {
                                             }
                                           }),
                                       IconButton(
-                                          icon: const Icon(Icons.edit),
-                                          onPressed: () {}),
-                                      IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          onPressed: () => _deleteSubDeck(
-                                              _subDecks[index]['id'])),
+                                        icon: const Icon(Icons.edit),
+                                        onPressed: () => _showSubDeckForm(
+                                            _subDecks[index]['id']),
+                                      ),
                                     ]),
                                   ),
                                   children: <Widget>[
@@ -571,7 +632,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                                             .toString() +
                                                         ' )'),
                                                 trailing: SizedBox(
-                                                  width: 150,
+                                                  width: 50,
                                                   child: Row(
                                                     children: [
                                                       IconButton(
@@ -583,26 +644,14 @@ class _DeckDetailState extends State<DeckDetail> {
                                                                           index]
                                                                       [
                                                                       "word"])),
-                                                      IconButton(
-                                                          icon: const Icon(
-                                                              Icons.edit),
-                                                          onPressed: () =>
-                                                              _showWordForm(
-                                                                  wordsInSubdeck[
-                                                                          index]
-                                                                      ['id'])),
-                                                      IconButton(
-                                                          icon: const Icon(
-                                                              Icons.delete),
-                                                          onPressed: () =>
-                                                              _deleteWord(
-                                                                  wordsInSubdeck[
-                                                                          index]
-                                                                      ['id'])),
                                                     ],
                                                   ),
                                                 ),
-                                                onTap: () {}),
+                                                onTap: () {
+                                                  _showWordForm(
+                                                      wordsInSubdeck[index]
+                                                          ['id']);
+                                                }),
                                             feedback: Material(
                                                 child: Container(
                                                     width: 300,
@@ -645,50 +694,45 @@ class _DeckDetailState extends State<DeckDetail> {
                             child: ListView.builder(
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
-                                itemCount: _words.length,
+                                itemCount: _wordsWithoutSubdeck.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   return Draggable(
-                                      data: _words[index]["id"],
+                                      data: _wordsWithoutSubdeck[index]["id"],
                                       child: SizedBox(
                                           width: 350,
                                           height: 50,
                                           child: ListTile(
-                                              leading: Text(_words[index]
-                                                      ["word"] +
-                                                  '   --->   ' +
-                                                  _words[index]["translation"] +
-                                                  '   ( ' +
-                                                  _words[index]["level"]
-                                                      .toString() +
-                                                  ' )'),
+                                              leading: Text(
+                                                  _wordsWithoutSubdeck[index]
+                                                          ["word"] +
+                                                      '   --->   ' +
+                                                      _wordsWithoutSubdeck[
+                                                              index]
+                                                          ["translation"] +
+                                                      '   ( ' +
+                                                      _wordsWithoutSubdeck[
+                                                              index]["level"]
+                                                          .toString() +
+                                                      ' )'),
                                               trailing: SizedBox(
-                                                width: 150,
+                                                width: 50,
                                                 child: Row(
                                                   children: [
                                                     IconButton(
                                                         icon: const Icon(Icons
                                                             .surround_sound),
-                                                        onPressed: () => tts
-                                                            .speak(_words[index]
+                                                        onPressed: () => tts.speak(
+                                                            _wordsWithoutSubdeck[
+                                                                    index]
                                                                 ["word"])),
-                                                    IconButton(
-                                                        icon: const Icon(
-                                                            Icons.edit),
-                                                        onPressed: () =>
-                                                            _showWordForm(
-                                                                _words[index]
-                                                                    ['id'])),
-                                                    IconButton(
-                                                        icon: const Icon(
-                                                            Icons.delete),
-                                                        onPressed: () =>
-                                                            _deleteWord(
-                                                                _words[index]
-                                                                    ['id'])),
                                                   ],
                                                 ),
                                               ),
-                                              onTap: () {})),
+                                              onTap: () {
+                                                _showWordForm(
+                                                    _wordsWithoutSubdeck[index]
+                                                        ['id']);
+                                              })),
                                       feedback: Material(
                                           child: Container(
                                               width: 300,
@@ -698,15 +742,18 @@ class _DeckDetailState extends State<DeckDetail> {
                                                       color:
                                                           Colors.blueAccent)),
                                               child: ListTile(
-                                                leading: Text(_words[index]
-                                                        ["word"] +
-                                                    '   --->   ' +
-                                                    _words[index]
-                                                        ["translation"] +
-                                                    '   ( ' +
-                                                    _words[index]["level"]
-                                                        .toString() +
-                                                    ' )'),
+                                                leading: Text(
+                                                    _wordsWithoutSubdeck[index]
+                                                            ["word"] +
+                                                        '   --->   ' +
+                                                        _wordsWithoutSubdeck[
+                                                                index]
+                                                            ["translation"] +
+                                                        '   ( ' +
+                                                        _wordsWithoutSubdeck[
+                                                                index]["level"]
+                                                            .toString() +
+                                                        ' )'),
                                               ))));
                                 }),
                           );

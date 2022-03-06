@@ -83,17 +83,12 @@ class _HomePageState extends State<HomePage> {
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                     trailing: SizedBox(
-                      width: 100,
+                      width: 50,
                       child: Row(
                         children: [
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.white),
                             onPressed: () => _showForm(_mainDecks[index]['id']),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.white),
-                            onPressed: () =>
-                                _deleteDeck(_mainDecks[index]['id']),
                           ),
                         ],
                       ),
@@ -148,25 +143,45 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(
                       height: 10,
                     ),
-                    ElevatedButton(
-                      child: Text(id == null ? 'Create New' : 'Update',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.black)),
-                      onPressed: () async {
-                        if (id == null) {
-                          await _addDeck();
-                        }
-                        if (id != null) {
-                          await _updateDeck(id);
-                        }
-                        _nameController.text = '';
-                        Navigator.of(context).pop();
-                      },
-                    )
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            child: Text(
+                                id == null ? 'Create New' : 'Update the Deck',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.black)),
+                            onPressed: () async {
+                              if (id == null) {
+                                await _addDeck();
+                              }
+                              if (id != null) {
+                                await _updateDeck(id);
+                              }
+                              _nameController.text = '';
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          ElevatedButton(
+                            child: Text(id == null ? 'Nix' : 'Delete the Deck',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.red)),
+                            onPressed: () async {
+                              if (id != null) {
+                                _deleteDeck(id);
+                              }
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ])
                   ],
                 ),
               ),
