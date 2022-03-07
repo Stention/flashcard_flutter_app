@@ -12,6 +12,8 @@ import 'main.dart';
 import 'quiz_find_translation.dart';
 import 'generate_csv_file.dart';
 
+import 'package:flutter_slidable/flutter_slidable.dart';
+
 class DeckDetail extends StatefulWidget {
   const DeckDetail({Key? key, required this.deckId, required this.deckName})
       : super(key: key);
@@ -248,9 +250,10 @@ class _DeckDetailState extends State<DeckDetail> {
                                 backgroundColor:
                                     MaterialStateProperty.all(Colors.red)),
                             onPressed: () async {
-                              id ??
-                                  _deleteWord(_words[_words
-                                      .indexWhere((w) => w['id'] == id)]['id']);
+                              if (id != null) {
+                                _deleteWord(_words[_words
+                                    .indexWhere((w) => w['id'] == id)]['id']);
+                              }
                               Navigator.of(context).pop();
                             },
                           )
@@ -564,120 +567,139 @@ class _DeckDetailState extends State<DeckDetail> {
 
                               return DragTarget<int>(
                                   builder: (context, data, rejectedItems) {
-                                return ExpansionTile(
-                                  title: Text(_subDecks[index]['name']),
-                                  subtitle: Text(
-                                      (wordsInSubdeck?.length ?? 0).toString() +
-                                          ' word(s)'),
-                                  controlAffinity:
-                                      ListTileControlAffinity.leading,
-                                  trailing: SizedBox(
-                                    width: 100,
-                                    child: Row(children: [
-                                      IconButton(
-                                          icon: const Icon(
-                                              Icons.verified_rounded),
-                                          onPressed: () {
-                                            if (wordsInSubdeck!.length < 10) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(const SnackBar(
-                                                content: Text(
-                                                    'To play games, you have to add at least 10 words!'),
-                                              ));
-                                            } else {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          FindTheWord(
-                                                              deckId:
-                                                                  widget.deckId,
-                                                              deckName: widget
-                                                                  .deckName,
-                                                              questions:
-                                                                  wordsInSubdeck,
-                                                              numberOfQuestions:
-                                                                  _numberOfQuestions)));
-                                            }
-                                          }),
-                                      IconButton(
-                                        icon: const Icon(Icons.edit),
-                                        onPressed: () => _showSubDeckForm(
-                                            _subDecks[index]['id']),
-                                      ),
-                                    ]),
-                                  ),
-                                  children: <Widget>[
-                                    ListView.builder(
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: wordsInSubdeck != null
-                                            ? wordsInSubdeck.length
-                                            : 0,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return Draggable(
-                                            data: wordsInSubdeck![index]["id"],
-                                            child: ListTile(
-                                                title: Text(
-                                                    wordsInSubdeck[index]
-                                                            ["word"] +
-                                                        '   --->   ' +
-                                                        wordsInSubdeck[index]
-                                                            ["translation"] +
-                                                        '   ( ' +
-                                                        wordsInSubdeck[index]
-                                                                ["level"]
-                                                            .toString() +
-                                                        ' )'),
-                                                trailing: SizedBox(
-                                                  width: 50,
-                                                  child: Row(
-                                                    children: [
-                                                      IconButton(
-                                                          icon: const Icon(Icons
-                                                              .surround_sound),
-                                                          onPressed: () =>
-                                                              tts.speak(
-                                                                  wordsInSubdeck[
-                                                                          index]
-                                                                      [
-                                                                      "word"])),
-                                                    ],
-                                                  ),
-                                                ),
-                                                onTap: () {
-                                                  _showWordForm(
+                                return Slidable(
+                                  endActionPane: ActionPane(
+                                      motion: const ScrollMotion(),
+                                      children: [
+                                        SlidableAction(
+                                          onPressed: (context) {
+                                            _showSubDeckForm(
+                                                _subDecks[index]['id']);
+                                          },
+                                          backgroundColor:
+                                              const Color(0xFF7BC043),
+                                          foregroundColor: Colors.white,
+                                          icon: Icons.archive,
+                                          label: 'Update',
+                                        ),
+                                        SlidableAction(
+                                          onPressed: (context) {},
+                                          backgroundColor:
+                                              const Color(0xFFFE4A49),
+                                          foregroundColor: Colors.white,
+                                          icon: Icons.delete,
+                                          label: 'Delete',
+                                        ),
+                                      ]),
+                                  child: ExpansionTile(
+                                    title: Text(_subDecks[index]['name']),
+                                    subtitle: Text((wordsInSubdeck?.length ?? 0)
+                                            .toString() +
+                                        ' word(s)'),
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    trailing: SizedBox(
+                                      width: 50,
+                                      child: Row(children: [
+                                        IconButton(
+                                            icon: const Icon(
+                                                Icons.verified_rounded),
+                                            onPressed: () {
+                                              if (wordsInSubdeck!.length < 10) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                        const SnackBar(
+                                                  content: Text(
+                                                      'To play games, you have to add at least 10 words!'),
+                                                ));
+                                              } else {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            FindTheWord(
+                                                                deckId: widget
+                                                                    .deckId,
+                                                                deckName: widget
+                                                                    .deckName,
+                                                                questions:
+                                                                    wordsInSubdeck,
+                                                                numberOfQuestions:
+                                                                    _numberOfQuestions)));
+                                              }
+                                            }),
+                                      ]),
+                                    ),
+                                    children: <Widget>[
+                                      ListView.builder(
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemCount: wordsInSubdeck != null
+                                              ? wordsInSubdeck.length
+                                              : 0,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Draggable(
+                                              data: wordsInSubdeck![index]
+                                                  ["id"],
+                                              child: ListTile(
+                                                  title: Text(
                                                       wordsInSubdeck[index]
-                                                          ['id']);
-                                                }),
-                                            feedback: Material(
-                                                child: Container(
-                                                    width: 300,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                            color: Colors
-                                                                .blueAccent)),
-                                                    child: ListTile(
-                                                      leading: Text(
+                                                              ["word"] +
+                                                          '   --->   ' +
                                                           wordsInSubdeck[index]
-                                                                  ["word"] +
-                                                              '   --->   ' +
-                                                              wordsInSubdeck[
-                                                                      index][
-                                                                  "translation"] +
-                                                              '   ( ' +
-                                                              wordsInSubdeck[
-                                                                          index]
-                                                                      ["level"]
-                                                                  .toString() +
-                                                              ' )'),
-                                                    ))),
-                                          );
-                                        })
-                                  ],
+                                                              ["translation"] +
+                                                          '   ( ' +
+                                                          wordsInSubdeck[index]
+                                                                  ["level"]
+                                                              .toString() +
+                                                          ' )'),
+                                                  trailing: SizedBox(
+                                                    width: 50,
+                                                    child: Row(
+                                                      children: [
+                                                        IconButton(
+                                                            icon: const Icon(Icons
+                                                                .surround_sound),
+                                                            onPressed: () => tts
+                                                                .speak(wordsInSubdeck[
+                                                                        index]
+                                                                    ["word"])),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  onTap: () {
+                                                    _showWordForm(
+                                                        wordsInSubdeck[index]
+                                                            ['id']);
+                                                  }),
+                                              feedback: Material(
+                                                  child: Container(
+                                                      width: 300,
+                                                      height: 50,
+                                                      decoration: BoxDecoration(
+                                                          border: Border.all(
+                                                              color: Colors
+                                                                  .blueAccent)),
+                                                      child: ListTile(
+                                                        leading: Text(wordsInSubdeck[
+                                                                index]["word"] +
+                                                            '   --->   ' +
+                                                            wordsInSubdeck[
+                                                                    index][
+                                                                "translation"] +
+                                                            '   ( ' +
+                                                            wordsInSubdeck[
+                                                                        index]
+                                                                    ["level"]
+                                                                .toString() +
+                                                            ' )'),
+                                                      ))),
+                                            );
+                                          })
+                                    ],
+                                  ),
                                 );
                               }, onAccept: (data) {
                                 setState(() {
