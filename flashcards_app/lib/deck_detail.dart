@@ -120,46 +120,28 @@ class _DeckDetailState extends State<DeckDetail> {
                     const SizedBox(
                       height: 10,
                     ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            child: Text(
-                                id == null
-                                    ? 'Create New Subdeck'
-                                    : 'Update the Subdeck',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.black)),
-                            onPressed: () async {
-                              if (id == null) {
-                                await _addSubdeck();
-                              }
-                              if (id != null) {
-                                await _updateSubdeck(id);
-                              }
-                              _nameController.text = '';
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ElevatedButton(
-                            child: Text(
-                                id == null ? "Nix" : "Delet the subdeck",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.red)),
-                            onPressed: () async {
-                              id == null ? 0 : _deleteSubDeck(id);
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ]),
+                    ElevatedButton(
+                      child: Text(
+                          id == null
+                              ? 'Create new subdeck'
+                              : 'Update the subdeck',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.black)),
+                      onPressed: () async {
+                        if (id == null) {
+                          await _addSubdeck();
+                        }
+                        if (id != null) {
+                          await _updateSubdeck(id);
+                        }
+                        _nameController.text = '';
+                        Navigator.of(context).pop();
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -580,10 +562,13 @@ class _DeckDetailState extends State<DeckDetail> {
                                               const Color(0xFF7BC043),
                                           foregroundColor: Colors.white,
                                           icon: Icons.archive,
-                                          label: 'Update',
+                                          label: 'Edit',
                                         ),
                                         SlidableAction(
-                                          onPressed: (context) {},
+                                          onPressed: (context) {
+                                            _deleteSubDeck(
+                                                _subDecks[index]['id']);
+                                          },
                                           backgroundColor:
                                               const Color(0xFFFE4A49),
                                           foregroundColor: Colors.white,
@@ -599,7 +584,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                     controlAffinity:
                                         ListTileControlAffinity.leading,
                                     trailing: SizedBox(
-                                      width: 50,
+                                      width: 100,
                                       child: Row(children: [
                                         IconButton(
                                             icon: const Icon(
@@ -622,6 +607,34 @@ class _DeckDetailState extends State<DeckDetail> {
                                                                     .deckId,
                                                                 deckName: widget
                                                                     .deckName,
+                                                                questions:
+                                                                    wordsInSubdeck,
+                                                                numberOfQuestions:
+                                                                    _numberOfQuestions)));
+                                              }
+                                            }),
+                                        IconButton(
+                                            icon: const Icon(
+                                                Icons.verified_user_sharp),
+                                            onPressed: () {
+                                              if (wordsInSubdeck!.length < 10) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                        const SnackBar(
+                                                  content: Text(
+                                                      'To play games, you have to add at least 10 words!'),
+                                                ));
+                                              } else {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            FindTranslation(
+                                                                deckId: widget
+                                                                    .deckId,
+                                                                deckName:
+                                                                    widget
+                                                                        .deckName,
                                                                 questions:
                                                                     wordsInSubdeck,
                                                                 numberOfQuestions:
