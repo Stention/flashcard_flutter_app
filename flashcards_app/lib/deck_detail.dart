@@ -50,7 +50,7 @@ class _DeckDetailState extends State<DeckDetail> {
   final TextEditingController _translationController = TextEditingController();
 
   void _refreshDecks() async {
-    final deck = await DatabaseHelper.getMainDeck(widget.deckId);
+    final deck = await DatabaseHelper.getDecks(widget.deckId);
     final data = await DatabaseHelper.getWords(widget.deckName);
     final wordsWithoutSubdeck =
         await DatabaseHelper.getWordsWithoutSubdeck(widget.deckName);
@@ -386,12 +386,12 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _updateSubdeck(int id) async {
-    await DatabaseHelper.updateSubDictionary(id, _nameController.text);
+    await DatabaseHelper.updateSubDeck(id, _nameController.text);
     _refreshDecks();
   }
 
   void _deleteSubDeck(int id) async {
-    await DatabaseHelper.deleteSubDictionary(id);
+    await DatabaseHelper.deleteSubDeck(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Successfully deleted a subdeck!'),
     ));
@@ -415,7 +415,7 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _addWordToSubdeck(int id, String subDeckName) async {
-    await DatabaseHelper.changeWordsSubdeck(id, subDeckName);
+    await DatabaseHelper.updateWordsSubdeck(id, subDeckName);
     _refreshDecks();
   }
 
@@ -425,13 +425,13 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _changeNumberOfQuestions(int numberOfQuestions) async {
-    await DatabaseHelper.updateMainDeckWordsNumber(
-        widget.deckId, widget.deckName, numberOfQuestions);
+    await DatabaseHelper.updateDeckWordsCount(widget.deckId, numberOfQuestions);
     _refreshDecks();
   }
 
   Future<void> _changeTargetLanguage(String targetLanguage) async {
-    await DatabaseHelper.changeTargetLanguage(widget.deckId, targetLanguage);
+    await DatabaseHelper.updateDeckTargetLanguage(
+        widget.deckId, targetLanguage);
     _refreshDecks();
   }
 

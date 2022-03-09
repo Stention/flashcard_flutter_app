@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _refreshDecks() async {
-    final data = await DatabaseHelper.getMainDecks();
+    final data = await DatabaseHelper.getDecks(null);
     setState(() {
       _mainDecks = data;
       _isLoading = false;
@@ -44,72 +44,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _addDeck() async {
-    await DatabaseHelper.createMainDeck(_nameController.text);
+    await DatabaseHelper.createDeck(_nameController.text);
     _refreshDecks();
   }
 
   Future<void> _updateDeck(int id) async {
-    await DatabaseHelper.updateMainDeck(id, _nameController.text);
+    await DatabaseHelper.updateDeck(id, _nameController.text);
     _refreshDecks();
   }
 
   void _deleteDeck(int id) async {
-    await DatabaseHelper.deleteMainDeck(id);
+    await DatabaseHelper.deleteDeck(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Successfully deleted a deck!'),
     ));
     _refreshDecks();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Language Decks',
-            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: _mainDecks.length,
-              itemBuilder: (BuildContext context, int index) => Card(
-                color: Colors.grey[800],
-                margin: const EdgeInsets.all(15),
-                child: ListTile(
-                    title: Text(_mainDecks[index]['name'],
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
-                    trailing: SizedBox(
-                      width: 50,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.white),
-                            onPressed: () => _showForm(_mainDecks[index]['id']),
-                          ),
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DeckDetail(
-                                deckId: _mainDecks[index]['id'],
-                                deckName: _mainDecks[index]['name'])),
-                      );
-                    }),
-              ),
-            ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.grey[800],
-        onPressed: () => _showForm(null),
-      ),
-    );
   }
 
   void _showForm(int? id) async {
@@ -186,5 +135,56 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: const Text('Language Decks',
+            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: _mainDecks.length,
+              itemBuilder: (BuildContext context, int index) => Card(
+                color: Colors.grey[800],
+                margin: const EdgeInsets.all(15),
+                child: ListTile(
+                    title: Text(_mainDecks[index]['name'],
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    trailing: SizedBox(
+                      width: 50,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.white),
+                            onPressed: () => _showForm(_mainDecks[index]['id']),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DeckDetail(
+                                deckId: _mainDecks[index]['id'],
+                                deckName: _mainDecks[index]['name'])),
+                      );
+                    }),
+              ),
+            ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.grey[800],
+        onPressed: () => _showForm(null),
+      ),
+    );
   }
 }
