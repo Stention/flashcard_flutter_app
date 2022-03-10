@@ -73,14 +73,14 @@ class _HomePageState extends State<HomePage> {
         builder: (_) => SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.all(15),
-                //  padding: EdgeInsets.only(
-                //      bottom: MediaQuery.of(context).viewInsets.bottom),
+                //      padding: EdgeInsets.only(
+                //        bottom: MediaQuery.of(context).viewInsets.bottom),
                 // width: double.infinity,
                 height: 300,
                 //   child: SingleChildScrollView(
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  //  mainAxisSize: MainAxisSize.min,
+                  // crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     TextField(
                       controller: _nameController,
