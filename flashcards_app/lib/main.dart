@@ -72,11 +72,11 @@ class _HomePageState extends State<HomePage> {
         elevation: 5,
         builder: (_) => SingleChildScrollView(
               child: Container(
-                // padding: const EdgeInsets.all(15),
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                padding: const EdgeInsets.all(15),
+                //  padding: EdgeInsets.only(
+                //      bottom: MediaQuery.of(context).viewInsets.bottom),
                 // width: double.infinity,
-                // height: 300,
+                height: 300,
                 //   child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
