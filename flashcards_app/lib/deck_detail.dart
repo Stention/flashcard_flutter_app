@@ -363,7 +363,7 @@ class _DeckDetailState extends State<DeckDetail> {
 
       for (List wordPair in words) {
         await DatabaseHelper.createWord(
-            wordPair[0], wordPair[1], widget.deckId, widget.deckName);
+            wordPair[0], wordPair[1], widget.deckName);
       }
     }
     _refreshDecks();
@@ -373,8 +373,7 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   Future<void> _addSubdeck() async {
-    await DatabaseHelper.createSubDeck(
-        _nameController.text, widget.deckId, widget.deckName);
+    await DatabaseHelper.createSubDeck(_nameController.text, widget.deckName);
     _refreshDecks();
   }
 
@@ -395,7 +394,6 @@ class _DeckDetailState extends State<DeckDetail> {
     await DatabaseHelper.createWord(
       _wordController.text,
       _translationController.text,
-      widget.deckId,
       widget.deckName,
     );
     _refreshDecks();
@@ -407,7 +405,7 @@ class _DeckDetailState extends State<DeckDetail> {
     _refreshDecks();
   }
 
-  Future<void> _addWordToSubdeck(int id, String subDeckName) async {
+  Future<void> _addWordToSubdeck(int id, String? subDeckName) async {
     await DatabaseHelper.updateWordsSubdeck(id, subDeckName);
     _refreshDecks();
   }
@@ -787,7 +785,7 @@ class _DeckDetailState extends State<DeckDetail> {
                           );
                         }, onAccept: (data) {
                           setState(() {
-                            _addWordToSubdeck(data, '');
+                            _addWordToSubdeck(data, null);
                           });
                         }),
                       ],

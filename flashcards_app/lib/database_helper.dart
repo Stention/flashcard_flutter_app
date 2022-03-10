@@ -14,9 +14,7 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         name TEXT UNIQUE,
-        dictionary_id INTEGER NOT NULL,
         dictionary_name TEXT NOT NULL,
-        FOREIGN KEY ("dictionary_id") REFERENCES "dictionary" ("id") ON UPDATE CASCADE ON DELETE CASCADE  
         FOREIGN KEY ("dictionary_name") REFERENCES "dictionary" ("name") ON UPDATE CASCADE ON DELETE CASCADE  
       );
       """;
@@ -25,13 +23,9 @@ class DatabaseHelper {
          word TEXT NOT NULL,
          translation TEXT NOT NULL,
          level TINYINT NOT NULL DEFAULT 0,
-         dictionary_id INTEGER NOT NULL,
          dictionary_name TEXT NOT NULL,
-         sub_dictionary_id INTEGER DEFAULT NULL,
          sub_dictionary_name TEXT DEFAULT NULL,
-         FOREIGN KEY ("dictionary_id") REFERENCES "dictionary" ("id") ON UPDATE CASCADE ON DELETE CASCADE 
          FOREIGN KEY ("dictionary_name") REFERENCES "dictionary" ("name") ON UPDATE CASCADE ON DELETE CASCADE 
-         FOREIGN KEY ("sub_dictionary_id") REFERENCES "sub_dictionary" ("id") ON UPDATE CASCADE ON DELETE CASCADE 
          FOREIGN KEY ("sub_dictionary_name") REFERENCES "sub_dictionary" ("name") ON UPDATE CASCADE ON DELETE CASCADE      
        );
        """;
@@ -110,13 +104,11 @@ class DatabaseHelper {
   }
 
 // sub_dictionary
-  static Future<int> createSubDeck(
-      String name, int deckId, String deckName) async {
+  static Future<int> createSubDeck(String name, String deckName) async {
     final db = await DatabaseHelper.db();
     final data = {
       'name': name,
       'createdAt': DateTime.now().toString(),
-      'dictionary_id': deckId,
       'dictionary_name': deckName
     };
     final id = await db.insert('sub_dictionary', data,
@@ -147,13 +139,12 @@ class DatabaseHelper {
   }
 
 // words
-  static Future<int> createWord(String word, String translation,
-      int dictionaryId, String dictionaryName) async {
+  static Future<int> createWord(
+      String word, String translation, String dictionaryName) async {
     final db = await DatabaseHelper.db();
     final data = {
       'word': word,
       'translation': translation,
-      'dictionary_id': dictionaryId,
       'dictionary_name': dictionaryName,
     };
     final id = await db.insert('words_pairs', data,
@@ -172,10 +163,9 @@ class DatabaseHelper {
     return result;
   }
 
-  static Future<int> updateWordsSubdeck(
-      int id, String subDictionaryName) async {
+  static Future<int> updateWordsSubdeck(int id, String? subdeckName) async {
     final db = await DatabaseHelper.db();
-    final data = {'sub_dictionary_name': subDictionaryName};
+    final data = {'sub_dictionary_name': subdeckName};
     final result =
         await db.update('words_pairs', data, where: 'id=?', whereArgs: [id]);
     return result;
@@ -198,7 +188,7 @@ class DatabaseHelper {
     final db = await DatabaseHelper.db();
     return db.query('words_pairs',
         where:
-            'dictionary_name = ? and (sub_dictionary_name is NULL or sub_dictionary_name = "")',
+            'dictionary_name = ? and (sub_dictionary_name is NULL)', // or sub_dictionary_name = "")',
         whereArgs: [dictionaryName],
         orderBy: 'id');
   }
