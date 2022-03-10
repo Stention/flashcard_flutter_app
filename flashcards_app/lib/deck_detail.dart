@@ -642,7 +642,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                               : 0,
                                           itemBuilder: (BuildContext context,
                                               int index) {
-                                            return Draggable(
+                                            return LongPressDraggable(
                                               data: wordsInSubdeck![index]
                                                   ["id"],
                                               child: ListTile(
@@ -685,7 +685,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                                               color: Colors
                                                                   .blueAccent)),
                                                       child: ListTile(
-                                                        leading: Text(wordsInSubdeck[
+                                                        title: Text(wordsInSubdeck[
                                                                 index]["word"] +
                                                             '   --->   ' +
                                                             wordsInSubdeck[
