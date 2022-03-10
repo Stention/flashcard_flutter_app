@@ -152,7 +152,7 @@ class _DeckDetailState extends State<DeckDetail> {
         builder: (_) => SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.all(15),
-                height: 450,
+                height: 470,
                 child: Column(
                   children: [
                     TextField(
