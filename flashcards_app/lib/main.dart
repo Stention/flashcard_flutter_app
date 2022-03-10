@@ -137,7 +137,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //  resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text('Language Decks',

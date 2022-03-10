@@ -97,14 +97,11 @@ class _DeckDetailState extends State<DeckDetail> {
         isScrollControlled: true,
         context: context,
         elevation: 5,
-        builder: (_) => Container(
-              padding: const EdgeInsets.all(15),
-              width: double.infinity,
-              height: 300,
-              child: SingleChildScrollView(
+        builder: (_) => SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                height: 400,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     TextField(
                       controller: _nameController,
@@ -152,14 +149,11 @@ class _DeckDetailState extends State<DeckDetail> {
         isScrollControlled: true,
         context: context,
         elevation: 5,
-        builder: (_) => Container(
-              padding: const EdgeInsets.all(15),
-              width: double.infinity,
-              height: 300,
-              child: SingleChildScrollView(
+        builder: (_) => SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(15),
+                height: 450,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     TextField(
                       controller: _wordController,
