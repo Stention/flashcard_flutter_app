@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-//import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:io';
@@ -10,7 +10,6 @@ import "database_helper.dart";
 import 'quiz_find_the_word.dart';
 import 'main.dart';
 import 'quiz_find_translation.dart';
-import 'generate_csv_file.dart';
 
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -326,35 +325,35 @@ class _DeckDetailState extends State<DeckDetail> {
     );
   }
 
-  // void _generateCsvFile() async {
-  //   final directory = await getApplicationDocumentsDirectory();
-  //   List<List<dynamic>> rows = [];
-  //   List<dynamic> header = [];
-  //   String deckName = widget.deckName;
+  void _generateCsvFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    List<List<dynamic>> rows = [];
+    List<dynamic> header = [];
+    String deckName = widget.deckName;
 
-  //   header.add("id");
-  //   header.add("dictionary_id");
-  //   header.add("dictionary_name");
-  //   header.add("sub_dictionary_name");
-  //   header.add("word");
-  //   header.add("translation");
-  //   rows.add(header);
-  //   for (int i = 0; i < _words.length; i++) {
-  //     List<dynamic> row = [];
-  //     row.add(_words[i]["id"]);
-  //     row.add(_words[i]["dictionary_id"]);
-  //     row.add(_words[i]["dictionary_name"]);
-  //     row.add(_words[i]["sub_dictionary_name"]);
-  //     row.add(_words[i]["word"]);
-  //     row.add(_words[i]["translation"]);
-  //     rows.add(row);
-  //   }
+    header.add("id");
+    header.add("dictionary_id");
+    header.add("dictionary_name");
+    header.add("sub_dictionary_name");
+    header.add("word");
+    header.add("translation");
+    rows.add(header);
+    for (int i = 0; i < _words.length; i++) {
+      List<dynamic> row = [];
+      row.add(_words[i]["id"]);
+      row.add(_words[i]["dictionary_id"]);
+      row.add(_words[i]["dictionary_name"]);
+      row.add(_words[i]["sub_dictionary_name"]);
+      row.add(_words[i]["word"]);
+      row.add(_words[i]["translation"]);
+      rows.add(row);
+    }
 
-  //  String csv = const ListToCsvConverter(fieldDelimiter: ";").convert(rows);
+    String csv = const ListToCsvConverter(fieldDelimiter: ";").convert(rows);
 
-  //  File file = File(directory.path + "/$deckName.csv");
-  //  file.writeAsString(csv);
-  // }
+    File file = File(directory.path + "/$deckName.csv");
+    file.writeAsString(csv);
+  }
 
   void _uploadCsvFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -453,7 +452,7 @@ class _DeckDetailState extends State<DeckDetail> {
           ),
           ListTile(
             title: const Text('Download Words file'),
-            onTap: () => generateCsvFile(widget.deckName, _words),
+            onTap: () => _generateCsvFile(),
           ),
           const ListTile(
             title: Text('How many words you want to learn?'),
