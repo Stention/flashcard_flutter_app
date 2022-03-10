@@ -73,14 +73,8 @@ class _HomePageState extends State<HomePage> {
         builder: (_) => SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.all(15),
-                // padding: EdgeInsets.only(
-                //     bottom: MediaQuery.of(context).viewInsets.bottom),
-                // width: double.infinity,
                 height: 400,
-                //   child: SingleChildScrollView(
                 child: Column(
-                  //  mainAxisSize: MainAxisSize.min,
-                  // crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     TextField(
                       controller: _nameController,
@@ -137,14 +131,13 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              //    ),
             ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      //  resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text('Language Decks',
