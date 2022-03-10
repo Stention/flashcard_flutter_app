@@ -71,7 +71,8 @@ class _HomePageState extends State<HomePage> {
         context: context,
         elevation: 5,
         builder: (_) => Container(
-              padding: const EdgeInsets.all(15),
+              // padding: const EdgeInsets.all(15),
+              padding: MediaQuery.of(context).viewInsets,
               width: double.infinity,
               height: 300,
               child: SingleChildScrollView(
