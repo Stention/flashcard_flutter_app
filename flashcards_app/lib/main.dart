@@ -70,69 +70,73 @@ class _HomePageState extends State<HomePage> {
         isScrollControlled: true,
         context: context,
         elevation: 5,
-        builder: (_) => Container(
-              // padding: const EdgeInsets.all(15),
-              padding: MediaQuery.of(context).viewInsets,
-              width: double.infinity,
-              height: 300,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        hintText: 'Deck name',
-                        focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2.0),
+        builder: (_) => SingleChildScrollView(
+              child: Container(
+                // padding: const EdgeInsets.all(15),
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                width: double.infinity,
+                height: 300,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      TextField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          hintText: 'Deck name',
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.black, width: 2.0),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            child: Text(
-                                id == null ? 'Create New' : 'Update the Deck',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.black)),
-                            onPressed: () async {
-                              if (id == null) {
-                                await _addDeck();
-                              }
-                              if (id != null) {
-                                await _updateDeck(id);
-                              }
-                              _nameController.text = '';
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          ElevatedButton(
-                            child: Text(id == null ? 'Nix' : 'Delete the Deck',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold)),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.red)),
-                            onPressed: () async {
-                              if (id != null) {
-                                _deleteDeck(id);
-                              }
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ])
-                  ],
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              child: Text(
+                                  id == null ? 'Create New' : 'Update the Deck',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.black)),
+                              onPressed: () async {
+                                if (id == null) {
+                                  await _addDeck();
+                                }
+                                if (id != null) {
+                                  await _updateDeck(id);
+                                }
+                                _nameController.text = '';
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            ElevatedButton(
+                              child: Text(
+                                  id == null ? 'Nix' : 'Delete the Deck',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.red)),
+                              onPressed: () async {
+                                if (id != null) {
+                                  _deleteDeck(id);
+                                }
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ])
+                    ],
+                  ),
                 ),
               ),
             ));
