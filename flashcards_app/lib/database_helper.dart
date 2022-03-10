@@ -187,8 +187,7 @@ class DatabaseHelper {
       String dictionaryName) async {
     final db = await DatabaseHelper.db();
     return db.query('words_pairs',
-        where:
-            'dictionary_name = ? and (sub_dictionary_name is NULL)', // or sub_dictionary_name = "")',
+        where: 'dictionary_name = ? and (sub_dictionary_name is NULL)',
         whereArgs: [dictionaryName],
         orderBy: 'id');
   }

@@ -326,7 +326,6 @@ class _DeckDetailState extends State<DeckDetail> {
     String deckName = widget.deckName;
 
     header.add("id");
-    header.add("dictionary_id");
     header.add("dictionary_name");
     header.add("sub_dictionary_name");
     header.add("word");
@@ -335,7 +334,6 @@ class _DeckDetailState extends State<DeckDetail> {
     for (int i = 0; i < _words.length; i++) {
       List<dynamic> row = [];
       row.add(_words[i]["id"]);
-      row.add(_words[i]["dictionary_id"]);
       row.add(_words[i]["dictionary_name"]);
       row.add(_words[i]["sub_dictionary_name"]);
       row.add(_words[i]["word"]);
@@ -368,7 +366,7 @@ class _DeckDetailState extends State<DeckDetail> {
     }
     _refreshDecks();
 
-    //final directory = await getApplicationDocumentsDirectory();
+    // Verifyfinal directory = await getApplicationDocumentsDirectory();
     //final inputCsvFile = File(directory.path + '/file.csv').openRead();
   }
 
@@ -722,24 +720,22 @@ class _DeckDetailState extends State<DeckDetail> {
                                 shrinkWrap: true,
                                 itemCount: _wordsWithoutSubdeck.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return Draggable(
+                                  return LongPressDraggable(
                                       data: _wordsWithoutSubdeck[index]["id"],
                                       child: SizedBox(
                                           width: 350,
                                           height: 50,
                                           child: ListTile(
-                                              leading: Text(
+                                              title: Text(_wordsWithoutSubdeck[
+                                                      index]["word"] +
+                                                  '   --->   ' +
                                                   _wordsWithoutSubdeck[index]
-                                                          ["word"] +
-                                                      '   --->   ' +
-                                                      _wordsWithoutSubdeck[
-                                                              index]
-                                                          ["translation"] +
-                                                      '   ( ' +
-                                                      _wordsWithoutSubdeck[
-                                                              index]["level"]
-                                                          .toString() +
-                                                      ' )'),
+                                                      ["translation"] +
+                                                  '   ( ' +
+                                                  _wordsWithoutSubdeck[index]
+                                                          ["level"]
+                                                      .toString() +
+                                                  ' )'),
                                               trailing: SizedBox(
                                                 width: 50,
                                                 child: Row(
@@ -768,7 +764,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                                       color:
                                                           Colors.blueAccent)),
                                               child: ListTile(
-                                                leading: Text(
+                                                title: Text(
                                                     _wordsWithoutSubdeck[index]
                                                             ["word"] +
                                                         '   --->   ' +
