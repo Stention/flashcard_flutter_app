@@ -31,7 +31,7 @@ class DatabaseHelper {
        """;
 
   static Future<sql.Database> db() async {
-    //await sql.deleteDatabase('demo_database.db');
+    await sql.deleteDatabase('demo_database.db');
     return sql.openDatabase('demo_database.db', version: 1,
         onCreate: (sql.Database database, int version) async {
       await database.execute(dictionary);
