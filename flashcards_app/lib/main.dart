@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                 // padding: EdgeInsets.only(
                 //     bottom: MediaQuery.of(context).viewInsets.bottom),
                 // width: double.infinity,
-                height: 550,
+                height: 400,
                 //   child: SingleChildScrollView(
                 child: Column(
                   //  mainAxisSize: MainAxisSize.min,
