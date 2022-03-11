@@ -147,6 +147,7 @@ class _HomePageState extends State<HomePage> {
               child: CircularProgressIndicator(),
             )
           : ListView.builder(
+              scrollDirection: Axis.vertical,
               itemCount: _mainDecks.length,
               itemBuilder: (BuildContext context, int index) => Card(
                 color: Colors.grey[800],

@@ -4,14 +4,14 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:io';
 import 'dart:convert' show utf8;
 import "database_helper.dart";
 import 'quiz_find_the_word.dart';
 import 'main.dart';
 import 'quiz_find_translation.dart';
-
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 class DeckDetail extends StatefulWidget {
   const DeckDetail({Key? key, required this.deckId, required this.deckName})
@@ -319,8 +319,36 @@ class _DeckDetailState extends State<DeckDetail> {
     );
   }
 
+  _setIndicatorColour(int level) {
+    if (level == 2) {
+      Color color = const Color(0x00000000);
+      return color;
+    } else if (level > 0 && level <= 2) {
+      Color color = Colors.red;
+      return color;
+    } else if (level > 2 && level <= 5) {
+      Color color = Colors.orange;
+      return color;
+    } else if (level > 5 && level <= 7) {
+      Color color = Colors.yellow;
+      return color;
+    } else if (level > 7 && level <= 10) {
+      Color color = Colors.lightGreen;
+      return color;
+    } else if (level > 7 && level <= 10) {
+      Color color = Colors.green;
+      return color;
+    }
+  }
+
+  _setIndicatorPercent(int level) {
+    double percent = level.toDouble() / 10;
+    return percent;
+  }
+
   void _generateCsvFile() async {
     final directory = await getApplicationDocumentsDirectory();
+
     List<List<dynamic>> rows = [];
     List<dynamic> header = [];
     String deckName = widget.deckName;
@@ -349,6 +377,7 @@ class _DeckDetailState extends State<DeckDetail> {
 
   void _uploadCsvFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
+    debugPrint(result.toString());
 
     if (result != null) {
       PlatformFile inputCsvFile = result.files.first;
@@ -645,58 +674,68 @@ class _DeckDetailState extends State<DeckDetail> {
                                             return LongPressDraggable(
                                               data: wordsInSubdeck![index]
                                                   ["id"],
-                                              child: ListTile(
-                                                  title: Text(
-                                                      wordsInSubdeck[index]
-                                                              ["word"] +
-                                                          '   --->   ' +
-                                                          wordsInSubdeck[index]
-                                                              ["translation"] +
-                                                          '   ( ' +
-                                                          wordsInSubdeck[index]
-                                                                  ["level"]
-                                                              .toString() +
-                                                          ' )'),
-                                                  trailing: SizedBox(
-                                                    width: 50,
-                                                    child: Row(
-                                                      children: [
-                                                        IconButton(
-                                                            icon: const Icon(Icons
-                                                                .surround_sound),
-                                                            onPressed: () => tts
-                                                                .speak(wordsInSubdeck[
-                                                                        index]
-                                                                    ["word"])),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  onTap: () {
-                                                    _showWordForm(
+                                              child: SizedBox(
+                                                width: 350,
+                                                height: 70,
+                                                child: ListTile(
+                                                    title: Text(
                                                         wordsInSubdeck[index]
-                                                            ['id']);
-                                                  }),
+                                                            ["word"]),
+                                                    subtitle: Text(
+                                                        wordsInSubdeck[index]
+                                                            ["translation"]),
+                                                    trailing: SizedBox(
+                                                      width: 100,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          CircularPercentIndicator(
+                                                            radius: 12.0,
+                                                            percent: _setIndicatorPercent(
+                                                                _wordsWithoutSubdeck[
+                                                                        index]
+                                                                    ["level"]),
+                                                            progressColor:
+                                                                _setIndicatorColour(
+                                                                    _wordsWithoutSubdeck[
+                                                                            index]
+                                                                        [
+                                                                        "level"]),
+                                                          ),
+                                                          IconButton(
+                                                              icon: const Icon(Icons
+                                                                  .surround_sound),
+                                                              onPressed: () => tts.speak(
+                                                                  wordsInSubdeck[
+                                                                          index]
+                                                                      [
+                                                                      "word"])),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      _showWordForm(
+                                                          wordsInSubdeck[index]
+                                                              ['id']);
+                                                    }),
+                                              ),
                                               feedback: Material(
                                                   child: Container(
-                                                      width: 300,
+                                                      width: 200,
                                                       height: 50,
                                                       decoration: BoxDecoration(
                                                           border: Border.all(
                                                               color: Colors
-                                                                  .blueAccent)),
+                                                                  .greenAccent)),
                                                       child: ListTile(
-                                                        title: Text(wordsInSubdeck[
-                                                                index]["word"] +
-                                                            '   --->   ' +
-                                                            wordsInSubdeck[
-                                                                    index][
-                                                                "translation"] +
-                                                            '   ( ' +
-                                                            wordsInSubdeck[
-                                                                        index]
-                                                                    ["level"]
-                                                                .toString() +
-                                                            ' )'),
+                                                        title: Text(
+                                                          wordsInSubdeck[index]
+                                                              ["word"],
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
                                                       ))),
                                             );
                                           })
@@ -716,30 +755,41 @@ class _DeckDetailState extends State<DeckDetail> {
                             width: 400.0,
                             height: MediaQuery.of(context).size.height,
                             child: ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
                                 itemCount: _wordsWithoutSubdeck.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   return LongPressDraggable(
                                       data: _wordsWithoutSubdeck[index]["id"],
                                       child: SizedBox(
                                           width: 350,
-                                          height: 50,
+                                          height: 70,
                                           child: ListTile(
-                                              title: Text(_wordsWithoutSubdeck[
-                                                      index]["word"] +
-                                                  '   --->   ' +
+                                              title: Text(
                                                   _wordsWithoutSubdeck[index]
-                                                      ["translation"] +
-                                                  '   ( ' +
+                                                      ["word"]),
+                                              subtitle: Text(
                                                   _wordsWithoutSubdeck[index]
-                                                          ["level"]
-                                                      .toString() +
-                                                  ' )'),
+                                                      ["translation"]),
                                               trailing: SizedBox(
-                                                width: 50,
+                                                width: 100,
                                                 child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
                                                   children: [
+                                                    CircularPercentIndicator(
+                                                      radius: 12.0,
+                                                      percent:
+                                                          _setIndicatorPercent(
+                                                              _wordsWithoutSubdeck[
+                                                                      index]
+                                                                  ["level"]),
+                                                      progressColor:
+                                                          _setIndicatorColour(
+                                                              _wordsWithoutSubdeck[
+                                                                      index]
+                                                                  ["level"]),
+                                                    ),
                                                     IconButton(
                                                         icon: const Icon(Icons
                                                             .surround_sound),
@@ -757,25 +807,18 @@ class _DeckDetailState extends State<DeckDetail> {
                                               })),
                                       feedback: Material(
                                           child: Container(
-                                              width: 300,
+                                              width: 200,
                                               height: 50,
                                               decoration: BoxDecoration(
                                                   border: Border.all(
                                                       color:
-                                                          Colors.blueAccent)),
+                                                          Colors.orangeAccent)),
                                               child: ListTile(
                                                 title: Text(
-                                                    _wordsWithoutSubdeck[index]
-                                                            ["word"] +
-                                                        '   --->   ' +
-                                                        _wordsWithoutSubdeck[
-                                                                index]
-                                                            ["translation"] +
-                                                        '   ( ' +
-                                                        _wordsWithoutSubdeck[
-                                                                index]["level"]
-                                                            .toString() +
-                                                        ' )'),
+                                                  _wordsWithoutSubdeck[index]
+                                                      ["word"],
+                                                  textAlign: TextAlign.center,
+                                                ),
                                               ))));
                                 }),
                           );
