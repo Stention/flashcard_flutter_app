@@ -145,6 +145,11 @@ class _DeckDetailState extends State<DeckDetail> {
   }
 
   void _showWordForm(int? id) async {
+    if (id != null) {
+      final existingWord = _words[_words.indexWhere((w) => w['id'] == id)];
+      _wordController.text = existingWord['word'];
+      _translationController.text = existingWord['translation'];
+    }
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -157,12 +162,9 @@ class _DeckDetailState extends State<DeckDetail> {
                   children: [
                     TextField(
                       controller: _wordController,
-                      decoration: InputDecoration(
-                        hintText: id == null
-                            ? 'word'
-                            : _words[_words.indexWhere((w) => w['id'] == id)]
-                                ['word'],
-                        focusedBorder: const OutlineInputBorder(
+                      decoration: const InputDecoration(
+                        hintText: 'word',
+                        focusedBorder: OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
                         ),
@@ -173,12 +175,9 @@ class _DeckDetailState extends State<DeckDetail> {
                     ),
                     TextField(
                       controller: _translationController,
-                      decoration: InputDecoration(
-                        hintText: id == null
-                            ? 'translation'
-                            : _words[_words.indexWhere((w) => w['id'] == id)]
-                                ['translation'],
-                        focusedBorder: const OutlineInputBorder(
+                      decoration: const InputDecoration(
+                        hintText: 'translation',
+                        focusedBorder: OutlineInputBorder(
                           borderSide:
                               BorderSide(color: Colors.black, width: 2.0),
                         ),
@@ -372,26 +371,46 @@ class _DeckDetailState extends State<DeckDetail> {
     String csv = const ListToCsvConverter(fieldDelimiter: ";").convert(rows);
 
     File file = File(directory.path + "/$deckName.csv");
-    file.writeAsString(csv);
+    try {
+      file.writeAsString(csv);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e'),
+      ));
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('File was successfully generated!'),
+    ));
   }
 
   void _uploadCsvFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
-    debugPrint(result.toString());
 
     if (result != null) {
       PlatformFile inputCsvFile = result.files.first;
 
       final input = File(inputCsvFile.path.toString()).openRead();
+
       final words = await input
           .transform(utf8.decoder)
           .transform(const CsvToListConverter(fieldDelimiter: ";"))
           .toList();
 
-      for (List wordPair in words) {
-        await DatabaseHelper.createWord(
-            wordPair[0], wordPair[1], widget.deckName);
+      try {
+        for (List wordPair in words) {
+          await DatabaseHelper.createWord(
+              wordPair[0], wordPair[1], widget.deckName);
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: $e'),
+        ));
       }
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('File was successfully uploaded!'),
+      ));
     }
     _refreshDecks();
 
