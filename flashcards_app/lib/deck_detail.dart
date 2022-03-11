@@ -762,71 +762,79 @@ class _DeckDetailState extends State<DeckDetail> {
                             width: 400.0,
                             height: MediaQuery.of(context).size.height,
                             child: ListView.builder(
+                                //  physics: const ClampingScrollPhysics(),
+                                //   shrinkWrap: true,
                                 scrollDirection: Axis.vertical,
-                                itemCount: _wordsWithoutSubdeck.length,
+                                itemCount: _wordsWithoutSubdeck.length + 1,
                                 itemBuilder: (BuildContext context, int index) {
-                                  return LongPressDraggable(
-                                      data: _wordsWithoutSubdeck[index]["id"],
-                                      child: SizedBox(
-                                          width: 350,
-                                          height: 70,
-                                          child: ListTile(
-                                              title: Text(
-                                                  _wordsWithoutSubdeck[index]
-                                                      ["word"]),
-                                              subtitle: Text(
-                                                  _wordsWithoutSubdeck[index]
-                                                      ["translation"]),
-                                              trailing: SizedBox(
-                                                width: 100,
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    CircularPercentIndicator(
-                                                      radius: 12.0,
-                                                      percent:
-                                                          _setIndicatorPercent(
-                                                              _wordsWithoutSubdeck[
-                                                                      index]
-                                                                  ["level"]),
-                                                      progressColor:
-                                                          _setIndicatorColour(
-                                                              _wordsWithoutSubdeck[
-                                                                      index]
-                                                                  ["level"]),
-                                                    ),
-                                                    IconButton(
-                                                        icon: const Icon(Icons
-                                                            .surround_sound),
-                                                        onPressed: () => tts.speak(
-                                                            _wordsWithoutSubdeck[
-                                                                    index]
-                                                                ["word"])),
-                                                  ],
-                                                ),
-                                              ),
-                                              onTap: () {
-                                                _showWordForm(
-                                                    _wordsWithoutSubdeck[index]
-                                                        ['id']);
-                                              })),
-                                      feedback: Material(
-                                          child: Container(
-                                              width: 200,
-                                              height: 50,
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color:
-                                                          Colors.orangeAccent)),
-                                              child: ListTile(
+                                  if (index == _wordsWithoutSubdeck.length) {
+                                    return const SizedBox(height: 250);
+                                  } else {
+                                    return LongPressDraggable(
+                                        data: _wordsWithoutSubdeck[index]["id"],
+                                        child: SizedBox(
+                                            width: 350,
+                                            height: 70,
+                                            child: ListTile(
                                                 title: Text(
-                                                  _wordsWithoutSubdeck[index]
-                                                      ["word"],
-                                                  textAlign: TextAlign.center,
+                                                    _wordsWithoutSubdeck[index]
+                                                        ["word"]),
+                                                subtitle: Text(
+                                                    _wordsWithoutSubdeck[index]
+                                                        ["translation"]),
+                                                trailing: SizedBox(
+                                                  width: 100,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      CircularPercentIndicator(
+                                                        radius: 12.0,
+                                                        percent:
+                                                            _setIndicatorPercent(
+                                                                _wordsWithoutSubdeck[
+                                                                        index]
+                                                                    ["level"]),
+                                                        progressColor:
+                                                            _setIndicatorColour(
+                                                                _wordsWithoutSubdeck[
+                                                                        index]
+                                                                    ["level"]),
+                                                      ),
+                                                      IconButton(
+                                                          icon: const Icon(Icons
+                                                              .surround_sound),
+                                                          onPressed: () =>
+                                                              tts.speak(
+                                                                  _wordsWithoutSubdeck[
+                                                                          index]
+                                                                      [
+                                                                      "word"])),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ))));
+                                                onTap: () {
+                                                  _showWordForm(
+                                                      _wordsWithoutSubdeck[
+                                                          index]['id']);
+                                                })),
+                                        feedback: Material(
+                                            child: Container(
+                                                width: 200,
+                                                height: 50,
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors
+                                                            .orangeAccent)),
+                                                child: ListTile(
+                                                  title: Text(
+                                                    _wordsWithoutSubdeck[index]
+                                                        ["word"],
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ))));
+                                  }
                                 }),
                           );
                         }, onAccept: (data) {
