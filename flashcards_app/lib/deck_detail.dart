@@ -30,18 +30,12 @@ class _DeckDetailState extends State<DeckDetail> {
 
   final Map<String, List> _wordsInSubdeck = {};
   List<Map<String, dynamic>> _subDecks = [];
-  static final Map<String, String> _languageMap = {
-    'Czech': 'cs-CZ',
-    'English': 'en-US',
-    'French': 'fr-CA',
-    'German': 'de-DE',
-    'Italian': 'it-IT',
-  };
+
   bool _isLoading = true;
   int _numberOfQuestions = 10;
   String _targetLanguage = '';
-  // List _listOfLanguages = [];
-  //List _listOfVoices = [];
+  List _listOfLanguages = [];
+//  List _listOfVoices = [];
 
   final FlutterTts tts = FlutterTts();
   final TextEditingController _nameController = TextEditingController();
@@ -62,8 +56,8 @@ class _DeckDetailState extends State<DeckDetail> {
       }
     }
 
-    //  List<String> languages = await tts.getLanguages;
-    // List<dynamic> voices = await tts.getVoices;
+    List<Object?> languages = await tts.getLanguages;
+    //List<dynamic> voices = await tts.getVoices;
     setState(() {
       _mainDeck = deck;
       _words = data;
@@ -76,8 +70,8 @@ class _DeckDetailState extends State<DeckDetail> {
       } else {
         _targetLanguage = _mainDeck[0]["targetLanguage"];
       }
-      //    _listOfLanguages = languages;
-      //_listOfVoices = voices;
+      _listOfLanguages = languages;
+      // _listOfVoices = voices;
     });
   }
 
@@ -474,6 +468,7 @@ class _DeckDetailState extends State<DeckDetail> {
 
   @override
   Widget build(BuildContext context) {
+    var languages = _listOfLanguages.map((item) => item as String).toList();
     tts.setLanguage(_targetLanguage);
     tts.setSpeechRate(0.5);
     return Scaffold(
@@ -535,21 +530,14 @@ class _DeckDetailState extends State<DeckDetail> {
                 children: <Widget>[
                   DropdownButton<String>(
                     hint: Text(_targetLanguage.toString()),
-                    items: <String>[
-                      'Czech',
-                      'English',
-                      'French',
-                      'German',
-                      'Italian',
-                    ].map((String value) {
+                    items: languages.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
                       );
                     }).toList(),
                     onChanged: (value) {
-                      String? language = _languageMap[value];
-                      _changeTargetLanguage(language.toString());
+                      _changeTargetLanguage(value.toString());
                     },
                   ),
                 ]),
