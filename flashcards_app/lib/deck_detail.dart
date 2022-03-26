@@ -90,11 +90,12 @@ class _DeckDetailState extends State<DeckDetail> {
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
-        elevation: 5,
-        builder: (_) => SingleChildScrollView(
+        builder: (BuildContext context) => SingleChildScrollView(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
               child: Container(
                 padding: const EdgeInsets.all(15),
-                height: 400,
+                height: MediaQuery.of(context).size.height / 3,
                 child: Column(
                   children: [
                     TextField(
@@ -147,11 +148,12 @@ class _DeckDetailState extends State<DeckDetail> {
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
-        elevation: 5,
-        builder: (_) => SingleChildScrollView(
+        builder: (BuildContext context) => SingleChildScrollView(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
               child: Container(
                 padding: const EdgeInsets.all(15),
-                height: 470,
+                height: MediaQuery.of(context).size.height / 3,
                 child: Column(
                   children: [
                     TextField(
