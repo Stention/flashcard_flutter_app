@@ -104,6 +104,7 @@ class _QuizState extends State<FindTranslation> {
     var correctAnswer = question != null ? question["translation"] : "no data";
     var answers = _answers(_allWordsPool, correctAnswer);
     question != null ? answers.add(question["translation"]) : "no data";
+    answers.shuffle();
 
     var appBar = AppBar(
         backgroundColor: Colors.black,
@@ -141,7 +142,9 @@ class _QuizState extends State<FindTranslation> {
                   width: MediaQuery.of(context).size.width,
                   child: Center(
                       child: Text(
-                          question != null ? question["word"] : "no data",
+                          question != null
+                              ? question["word"]
+                              : "no more questions",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,

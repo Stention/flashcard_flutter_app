@@ -477,9 +477,14 @@ class _DeckDetailState extends State<DeckDetail> {
         endDrawer: Drawer(
             child: ListView(padding: EdgeInsets.zero, children: [
           const DrawerHeader(
-              child: Text("Menu",
-                  style: TextStyle(
-                      color: Colors.purple, fontWeight: FontWeight.bold)),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text("Menu",
+                    style: TextStyle(
+                        color: Colors.purple,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25)),
+              ),
               decoration: BoxDecoration(color: Colors.black)),
           ListTile(
             title: const Text('Upload Words file'),
@@ -499,14 +504,14 @@ class _DeckDetailState extends State<DeckDetail> {
                   ElevatedButton(
                     child: Text(_numberOfQuestions == 10 ? '10' : '10'),
                     style: ElevatedButton.styleFrom(
-                      primary: _numberOfQuestions == 10 ? Colors.teal : null,
+                      primary: _numberOfQuestions == 10 ? Colors.purple : null,
                     ),
                     onPressed: () => _changeNumberOfQuestions(10),
                   ),
                   ElevatedButton(
                     child: Text(_numberOfQuestions == 30 ? '30' : '30'),
                     style: ElevatedButton.styleFrom(
-                      primary: _numberOfQuestions == 30 ? Colors.teal : null,
+                      primary: _numberOfQuestions == 30 ? Colors.purple : null,
                     ),
                     onPressed: () {
                       _changeNumberOfQuestions(30);
@@ -515,7 +520,7 @@ class _DeckDetailState extends State<DeckDetail> {
                   ElevatedButton(
                     child: Text(_numberOfQuestions == 50 ? '50' : '50'),
                     style: ElevatedButton.styleFrom(
-                      primary: _numberOfQuestions == 50 ? Colors.teal : null,
+                      primary: _numberOfQuestions == 50 ? Colors.purple : null,
                     ),
                     onPressed: () {
                       _changeNumberOfQuestions(50);

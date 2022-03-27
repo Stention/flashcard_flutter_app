@@ -102,9 +102,9 @@ class _QuizState extends State<FindTheWord> {
   @override
   Widget build(BuildContext context) {
     var question = _question(_gameWordsPool);
-    var correctAnswer = question != null ? question["word"] : "no question";
+    var correctAnswer = question != null ? question["word"] : "no data";
     var answers = _answers(_allWordsPool, correctAnswer);
-    question != null ? answers.add(question["word"]) : "no answer";
+    question != null ? answers.add(question["word"]) : "no data";
     answers.shuffle();
 
     var appBar = AppBar(
@@ -145,7 +145,7 @@ class _QuizState extends State<FindTheWord> {
                       child: Text(
                           question != null
                               ? question["translation"]
-                              : "no translation",
+                              : "no more questions",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
