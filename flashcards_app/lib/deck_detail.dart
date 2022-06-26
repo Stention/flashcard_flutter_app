@@ -9,6 +9,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:io';
 import 'dart:convert' show utf8;
 import "database_helper.dart";
+import 'filter_words.dart';
 import 'quiz_find_the_word.dart';
 import 'main.dart';
 import 'quiz_find_translation.dart';
@@ -242,6 +243,23 @@ class _DeckDetailState extends State<DeckDetail> {
       visible: true,
       curve: Curves.bounceInOut,
       children: [
+        SpeedDialChild(
+          child: const Icon(Icons.search, color: Colors.white),
+          backgroundColor: Colors.black,
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FilterWords(
+                          deckId: widget.deckId,
+                          deckName: widget.deckName,
+                        )));
+          },
+          label: 'Search in deck',
+          labelStyle:
+              const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+          labelBackgroundColor: Colors.black,
+        ),
         SpeedDialChild(
           child: const Icon(Icons.add, color: Colors.white),
           backgroundColor: Colors.green[800],

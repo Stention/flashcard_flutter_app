@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import "database_helper.dart";
 import "deck_detail.dart";
+import "services/add_deck.dart";
+import "services/update_deck.dart";
+import "services/delete_deck.dart";
 
 void main() => runApp(const MyApp());
 
@@ -41,24 +44,6 @@ class _HomePageState extends State<HomePage> {
       _mainDecks = data;
       _isLoading = false;
     });
-  }
-
-  Future<void> _addDeck() async {
-    await DatabaseHelper.createDeck(_nameController.text);
-    _refreshDecks();
-  }
-
-  Future<void> _updateDeck(int id) async {
-    await DatabaseHelper.updateDeck(id, _nameController.text);
-    _refreshDecks();
-  }
-
-  void _deleteDeck(int id) async {
-    await DatabaseHelper.deleteDeck(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Successfully deleted a deck!'),
-    ));
-    _refreshDecks();
   }
 
   void _showForm(int? id) async {
@@ -104,10 +89,12 @@ class _HomePageState extends State<HomePage> {
                                     MaterialStateProperty.all(Colors.black)),
                             onPressed: () async {
                               if (id == null) {
-                                await _addDeck();
+                                await addDeck(_nameController.text);
+                                _refreshDecks();
                               }
                               if (id != null) {
-                                await _updateDeck(id);
+                                await updateDeck(id, _nameController.text);
+                                _refreshDecks();
                               }
                               _nameController.text = '';
                               Navigator.of(context).pop();
@@ -123,7 +110,8 @@ class _HomePageState extends State<HomePage> {
                                     MaterialStateProperty.all(Colors.red)),
                             onPressed: () async {
                               if (id != null) {
-                                _deleteDeck(id);
+                                deleteDeck(id, context);
+                                _refreshDecks();
                               }
                               Navigator.of(context).pop();
                             },
