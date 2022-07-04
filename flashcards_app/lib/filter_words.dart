@@ -1,3 +1,4 @@
+import 'package:flashcards_app/services/deck_detail/show_word_form.dart';
 import "package:flutter/material.dart";
 import "database_helper.dart";
 
@@ -86,16 +87,23 @@ class _FilterWordsState extends State<FilterWords> {
                                     margin: const EdgeInsets.symmetric(
                                         vertical: 10),
                                     child: ListTile(
-                                      leading: Text(
-                                        _foundWords[index]["word"].toString(),
-                                        style: const TextStyle(fontSize: 24),
-                                      ),
-                                      title: Text(
-                                          _foundWords[index]['translation']),
-                                      subtitle: const Text(
-                                        '_________',
-                                      ),
-                                    ),
+                                        leading: Text(
+                                          _foundWords[index]["word"].toString(),
+                                          style: const TextStyle(fontSize: 24),
+                                        ),
+                                        title: Text(
+                                            _foundWords[index]['translation']),
+                                        subtitle: const Text(
+                                          '_________',
+                                        ),
+                                        onTap: () {
+                                          showWordForm(
+                                              _foundWords[index]["id"],
+                                              _foundWords,
+                                              widget.deckName,
+                                              context,
+                                              refreshDeck: _refreshDecks);
+                                        }),
                                   ))
                           : ListView.builder(
                               itemCount: _allWords.length,
@@ -106,13 +114,20 @@ class _FilterWordsState extends State<FilterWords> {
                                     margin: const EdgeInsets.symmetric(
                                         vertical: 10),
                                     child: ListTile(
-                                      leading: Text(
-                                        _allWords[index]["word"].toString(),
-                                        style: const TextStyle(fontSize: 18),
-                                      ),
-                                      title:
-                                          Text(_allWords[index]['translation']),
-                                    ),
+                                        leading: Text(
+                                          _allWords[index]["word"].toString(),
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                        title: Text(
+                                            _allWords[index]['translation']),
+                                        onTap: () {
+                                          showWordForm(
+                                              _allWords[index]["id"],
+                                              _allWords,
+                                              widget.deckName,
+                                              context,
+                                              refreshDeck: _refreshDecks);
+                                        }),
                                   )),
                     ),
                   ],

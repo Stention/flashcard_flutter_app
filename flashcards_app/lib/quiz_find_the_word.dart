@@ -1,8 +1,9 @@
+import 'package:flashcards_app/services/quiz/get_answers.dart';
+import 'package:flashcards_app/services/quiz/update_level.dart';
+import 'package:flashcards_app/services/quiz/get_question.dart';
 import 'package:flashcards_app/summary.dart';
 import "package:flutter/material.dart";
-import "dart:math";
 import 'package:collection/collection.dart';
-import "database_helper.dart";
 
 class FindTheWord extends StatefulWidget {
   final int deckId;
@@ -67,32 +68,6 @@ class _QuizState extends State<FindTheWord> {
     });
   }
 
-  Future<void> _updateLevel(int id, int level, answer) async {
-    await DatabaseHelper.changeLevel(id, level, answer);
-  }
-
-  _question(_gameWordsPool) {
-    final _random = Random();
-    if (_gameWordsPool.isNotEmpty) {
-      var wordsPool = _gameWordsPool;
-      return wordsPool[_random.nextInt(wordsPool.length)];
-    }
-  }
-
-  _answers(_allWordsPool, correctAnswer) {
-    final _random = Random();
-    if (_allWordsPool.isNotEmpty) {
-      List answers = [];
-      while (answers.length < 3) {
-        var word = _allWordsPool[_random.nextInt(_allWordsPool.length)];
-        if (word["word"] != correctAnswer && !answers.contains(word["word"])) {
-          answers.add(word["word"]);
-        }
-      }
-      return answers;
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -101,9 +76,9 @@ class _QuizState extends State<FindTheWord> {
 
   @override
   Widget build(BuildContext context) {
-    var question = _question(_gameWordsPool);
+    var question = getQuestion(_gameWordsPool);
     var correctAnswer = question != null ? question["word"] : "no data";
-    var answers = _answers(_allWordsPool, correctAnswer);
+    var answers = getAnswers(_allWordsPool, correctAnswer);
     question != null ? answers.add(question["word"]) : "no data";
     answers.shuffle();
 
@@ -167,7 +142,7 @@ class _QuizState extends State<FindTheWord> {
                           onPressed: () {
                             if (question["word"] == answers[index]) {
                               debugPrint("Correct");
-                              _updateLevel(
+                              updateLevel(
                                   question["id"], question["level"], "correct");
                               finalScore++;
                               _gameWordsPool.removeWhere((answer) =>
@@ -175,7 +150,7 @@ class _QuizState extends State<FindTheWord> {
                                   question["translation"]);
                             } else {
                               debugPrint("False");
-                              _updateLevel(
+                              updateLevel(
                                   question["id"], question["level"], "false");
                             }
                             updateQuestion();
