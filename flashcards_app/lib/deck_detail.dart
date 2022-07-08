@@ -34,8 +34,7 @@ class _DeckDetailState extends State<DeckDetail> {
   bool _isLoading = true;
   int _numberOfQuestions = 10;
   String _targetLanguage = '';
-  List _listOfLanguages = [];
-//  List _listOfVoices = [];
+
   final FlutterTts tts = FlutterTts();
 
   @override
@@ -58,8 +57,6 @@ class _DeckDetailState extends State<DeckDetail> {
       }
     }
 
-    List<Object?> languages = await tts.getLanguages;
-    //List<dynamic> voices = await tts.getVoices;
     setState(() {
       _mainDeck = deck;
       _words = data;
@@ -72,14 +69,11 @@ class _DeckDetailState extends State<DeckDetail> {
       } else {
         _targetLanguage = _mainDeck[0]["targetLanguage"];
       }
-      _listOfLanguages = languages;
-      // _listOfVoices = voices;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    //var languages = _listOfLanguages.map((item) => item as String).toList();
     tts.setLanguage(_targetLanguage);
     tts.setSpeechRate(0.5);
     return Scaffold(
@@ -89,7 +83,6 @@ class _DeckDetailState extends State<DeckDetail> {
             targetLanguage: _targetLanguage,
             numberOfQuestions: _numberOfQuestions,
             words: _words,
-            listOfLanguages: _listOfLanguages,
             refreshDeck: _refreshDeck),
         appBar: AppBar(
             backgroundColor: Colors.white,

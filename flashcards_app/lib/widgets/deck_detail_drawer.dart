@@ -3,14 +3,14 @@ import 'package:flashcards_app/services/deck_detail/change_target_language.dart'
 import 'package:flashcards_app/services/deck_detail/generate_csv.dart';
 import 'package:flashcards_app/services/deck_detail/upload_csv.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
-class DeckDetailDrawer extends StatelessWidget {
+class DeckDetailDrawer extends StatefulWidget {
   final int deckId;
   final String deckName;
   final String targetLanguage;
   final int numberOfQuestions;
   final List words = [];
-  final List listOfLanguages = [];
   final Function refreshDeck;
   DeckDetailDrawer(
       {Key? key,
@@ -19,13 +19,36 @@ class DeckDetailDrawer extends StatelessWidget {
       required this.targetLanguage,
       required this.numberOfQuestions,
       required words,
-      required listOfLanguages,
       required this.refreshDeck})
       : super(key: key);
 
   @override
+  _DeckDetailDrawerState createState() => _DeckDetailDrawerState();
+}
+
+class _DeckDetailDrawerState extends State<DeckDetailDrawer> {
+  final FlutterTts tts = FlutterTts();
+  List _listOfLanguages = [];
+  //  List _listOfVoices = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getLanguages();
+  }
+
+  void _getLanguages() async {
+    List<Object?> languages = await tts.getLanguages;
+    //List<dynamic> voices = await tts.getVoices;
+    setState(() {
+      _listOfLanguages = languages;
+      // _listOfVoices = voices;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var languages = listOfLanguages.map((item) => item as String).toList();
+    var languages = _listOfLanguages.map((item) => item as String).toList();
     return Drawer(
         child: ListView(padding: EdgeInsets.zero, children: [
       const DrawerHeader(
@@ -40,11 +63,12 @@ class DeckDetailDrawer extends StatelessWidget {
           decoration: BoxDecoration(color: Colors.black)),
       ListTile(
         title: const Text('Upload Words file'),
-        onTap: () => uploadCsvFile(deckName, context, refreshDeck: refreshDeck),
+        onTap: () => uploadCsvFile(widget.deckName, context,
+            refreshDeck: widget.refreshDeck),
       ),
       ListTile(
         title: const Text('Download Words file'),
-        onTap: () => generateCsvFile(deckName, words, context),
+        onTap: () => generateCsvFile(widget.deckName, widget.words, context),
       ),
       const ListTile(
         title: Text('How many words you want to learn?'),
@@ -53,28 +77,28 @@ class DeckDetailDrawer extends StatelessWidget {
         title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <
             Widget>[
           ElevatedButton(
-            child: Text(numberOfQuestions == 10 ? '10' : '10'),
+            child: Text(widget.numberOfQuestions == 10 ? '10' : '10'),
             style: ElevatedButton.styleFrom(
-              primary: numberOfQuestions == 10 ? Colors.purple : null,
+              primary: widget.numberOfQuestions == 10 ? Colors.purple : null,
             ),
-            onPressed: () =>
-                changeNumberOfQuestions(deckId, 10, refreshDeck: refreshDeck),
+            onPressed: () => changeNumberOfQuestions(widget.deckId, 10,
+                refreshDeck: widget.refreshDeck),
           ),
           ElevatedButton(
-            child: Text(numberOfQuestions == 30 ? '30' : '30'),
+            child: Text(widget.numberOfQuestions == 30 ? '30' : '30'),
             style: ElevatedButton.styleFrom(
-              primary: numberOfQuestions == 30 ? Colors.purple : null,
+              primary: widget.numberOfQuestions == 30 ? Colors.purple : null,
             ),
-            onPressed: () =>
-                changeNumberOfQuestions(deckId, 30, refreshDeck: refreshDeck),
+            onPressed: () => changeNumberOfQuestions(widget.deckId, 30,
+                refreshDeck: widget.refreshDeck),
           ),
           ElevatedButton(
-            child: Text(numberOfQuestions == 50 ? '50' : '50'),
+            child: Text(widget.numberOfQuestions == 50 ? '50' : '50'),
             style: ElevatedButton.styleFrom(
-              primary: numberOfQuestions == 50 ? Colors.purple : null,
+              primary: widget.numberOfQuestions == 50 ? Colors.purple : null,
             ),
-            onPressed: () =>
-                changeNumberOfQuestions(deckId, 50, refreshDeck: refreshDeck),
+            onPressed: () => changeNumberOfQuestions(widget.deckId, 50,
+                refreshDeck: widget.refreshDeck),
           )
         ]),
       ),
@@ -86,7 +110,7 @@ class DeckDetailDrawer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               DropdownButton<String>(
-                hint: Text(targetLanguage.toString()),
+                hint: Text(widget.targetLanguage.toString()),
                 items: languages.map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -94,8 +118,8 @@ class DeckDetailDrawer extends StatelessWidget {
                   );
                 }).toList(),
                 onChanged: (value) {
-                  changeTargetLanguage(deckId, value.toString(),
-                      refreshDeck: refreshDeck);
+                  changeTargetLanguage(widget.deckId, value.toString(),
+                      refreshDeck: widget.refreshDeck);
                 },
               ),
             ]),
