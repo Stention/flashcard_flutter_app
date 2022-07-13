@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'deck_detail.dart';
+import '../../deck_detail/deck_detail.dart';
 
 var finalScore = 0;
 var questionNumber = 0;

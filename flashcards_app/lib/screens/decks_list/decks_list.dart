@@ -1,6 +1,6 @@
 import 'package:flashcards_app/database_helper.dart';
-import 'package:flashcards_app/deck_detail.dart';
-import 'package:flashcards_app/services/decks_list/show_deck_form.dart';
+import 'package:flashcards_app/screens/deck_detail/deck_detail.dart';
+import 'package:flashcards_app/screens/decks_list/components/show_deck_form.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {

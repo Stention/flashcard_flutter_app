@@ -1,7 +1,5 @@
-import 'package:flashcards_app/services/quiz/get_answers.dart';
-import 'package:flashcards_app/services/quiz/update_level.dart';
-import 'package:flashcards_app/services/quiz/get_question.dart';
-import 'package:flashcards_app/summary.dart';
+import 'package:flashcards_app/screens/quiz/components/quiz_manager.dart';
+import 'package:flashcards_app/screens/quiz/components/summary.dart';
 import "package:flutter/material.dart";
 import 'package:collection/collection.dart';
 
@@ -25,9 +23,26 @@ class FindTheWord extends StatefulWidget {
 }
 
 class _QuizState extends State<FindTheWord> {
+  final _quizManager = QuizManager();
   List<dynamic> _allWordsPool = [];
   List<dynamic> _gameWordsPool = [];
   int _numberOfQuestions = 0;
+
+  void _createWordsPool() async {
+    final data = widget.questions;
+    final numberOfQuestions = widget.numberOfQuestions;
+    setState(() {
+      _allWordsPool = data;
+      _numberOfQuestions = numberOfQuestions;
+      _gameWordsPool = data.sample(numberOfQuestions);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _createWordsPool();
+  }
 
   Future<bool?> showWarning(BuildContext context) async => showDialog<bool>(
         context: context,
@@ -58,29 +73,13 @@ class _QuizState extends State<FindTheWord> {
             ]),
       );
 
-  void _createWordsPool() async {
-    final data = widget.questions;
-    final numberOfQuestions = widget.numberOfQuestions;
-    setState(() {
-      _allWordsPool = data;
-      _numberOfQuestions = numberOfQuestions;
-      _gameWordsPool = data.sample(numberOfQuestions);
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _createWordsPool();
-  }
-
   @override
   Widget build(BuildContext context) {
-    var question = getQuestion(_gameWordsPool);
+    dynamic question = _quizManager.getQuestion(_gameWordsPool);
     var correctAnswer = question != null ? question["word"] : "no data";
-    var answers = getAnswers(_allWordsPool, correctAnswer);
-    question != null ? answers.add(question["word"]) : "no data";
-    answers.shuffle();
+    var answers = _quizManager.getAnswers(_allWordsPool, correctAnswer);
+    question != null ? answers?.add(question["word"]) : "no data";
+    answers?.shuffle();
 
     var appBar = AppBar(
         backgroundColor: Colors.black,
@@ -136,13 +135,13 @@ class _QuizState extends State<FindTheWord> {
                       height: 75,
                       color: Colors.black,
                       child: MaterialButton(
-                          child: Text(answers[index],
+                          child: Text(answers![index],
                               style: const TextStyle(
                                   fontSize: 20.0, color: Colors.white)),
                           onPressed: () {
                             if (question["word"] == answers[index]) {
                               debugPrint("Correct");
-                              updateLevel(
+                              _quizManager.updateLevel(
                                   question["id"], question["level"], "correct");
                               finalScore++;
                               _gameWordsPool.removeWhere((answer) =>
@@ -150,7 +149,7 @@ class _QuizState extends State<FindTheWord> {
                                   question["translation"]);
                             } else {
                               debugPrint("False");
-                              updateLevel(
+                              _quizManager.updateLevel(
                                   question["id"], question["level"], "false");
                             }
                             updateQuestion();

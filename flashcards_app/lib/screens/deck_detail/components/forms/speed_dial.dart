@@ -1,8 +1,8 @@
-import 'package:flashcards_app/filter_words.dart';
-import 'package:flashcards_app/quiz_find_the_word.dart';
-import 'package:flashcards_app/quiz_find_translation.dart';
-import 'package:flashcards_app/services/deck_detail/show_subdeck_form.dart';
-import 'package:flashcards_app/services/deck_detail/show_word_form.dart';
+import 'package:flashcards_app/screens/words_filter/words_filter.dart';
+import 'package:flashcards_app/screens/quiz/quiz_find_the_word.dart';
+import 'package:flashcards_app/screens/quiz/quiz_find_translation.dart';
+import 'package:flashcards_app/screens/deck_detail/components/forms/show_subdeck_form.dart';
+import 'package:flashcards_app/screens/deck_detail/components/forms/show_word_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 

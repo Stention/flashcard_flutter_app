@@ -1,6 +1,7 @@
-import 'package:flashcards_app/services/decks_list/add_deck.dart';
-import 'package:flashcards_app/services/decks_list/delete_deck.dart';
-import 'package:flashcards_app/services/decks_list/update_deck.dart';
+//import 'package:flashcards_app/screens/decks_list/components/add_deck.dart';
+//import 'package:flashcards_app/screens/decks_list/components/delete_deck.dart';
+//import 'package:flashcards_app/screens/decks_list/components/update_deck.dart';
+import 'package:flashcards_app/screens/decks_list/components/deck_list_manager.dart';
 import 'package:flutter/material.dart';
 
 void showDeckForm(int? id, dynamic context, List decks,
@@ -48,11 +49,12 @@ void showDeckForm(int? id, dynamic context, List decks,
                                   MaterialStateProperty.all(Colors.black)),
                           onPressed: () async {
                             if (id == null) {
-                              await addDeck(_nameController.text);
+                              await DeckManager().addDeck(_nameController.text);
                               refreshDeck();
                             }
                             if (id != null) {
-                              await updateDeck(id, _nameController.text);
+                              await DeckManager()
+                                  .updateDeck(id, _nameController.text);
                               refreshDeck();
                             }
                             _nameController.text = '';
@@ -69,7 +71,7 @@ void showDeckForm(int? id, dynamic context, List decks,
                                   MaterialStateProperty.all(Colors.red)),
                           onPressed: () async {
                             if (id != null) {
-                              await deleteDeck(id, context);
+                              await DeckManager().deleteDeck(id, context);
                               refreshDeck();
                             }
                             Navigator.of(context).pop();

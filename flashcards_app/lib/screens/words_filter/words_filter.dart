@@ -1,6 +1,6 @@
-import 'package:flashcards_app/services/deck_detail/show_word_form.dart';
+import 'package:flashcards_app/screens/deck_detail/components/forms/show_word_form.dart';
 import "package:flutter/material.dart";
-import "database_helper.dart";
+import '../../database_helper.dart';
 
 class FilterWords extends StatefulWidget {
   final int deckId;

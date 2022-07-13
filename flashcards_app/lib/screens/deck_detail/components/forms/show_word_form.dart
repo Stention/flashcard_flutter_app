@@ -1,6 +1,4 @@
-import 'package:flashcards_app/services/deck_detail/words/add_word.dart';
-import 'package:flashcards_app/services/deck_detail/words/delete_word.dart';
-import 'package:flashcards_app/services/deck_detail/words/update_word.dart';
+import 'package:flashcards_app/screens/deck_detail/components/words_manager.dart';
 import 'package:flutter/material.dart';
 
 void showWordForm(int? id, words, deckName, context,
@@ -65,12 +63,14 @@ void showWordForm(int? id, words, deckName, context,
                                   MaterialStateProperty.all(Colors.black)),
                           onPressed: () async {
                             if (id == null) {
-                              await addWord(_wordController.text,
+                              await WordsManager().addWord(_wordController.text,
                                   _translationController.text, deckName);
                               refreshDeck();
                             }
                             if (id != null) {
-                              await updateWord(id, _wordController.text,
+                              await WordsManager().updateWord(
+                                  id,
+                                  _wordController.text,
                                   _translationController.text);
                               refreshDeck();
                             }
@@ -89,7 +89,7 @@ void showWordForm(int? id, words, deckName, context,
                                   MaterialStateProperty.all(Colors.red)),
                           onPressed: () async {
                             if (id != null) {
-                              await deleteWord(
+                              await WordsManager().deleteWord(
                                   words[words.indexWhere((w) => w['id'] == id)]
                                       ['id']);
                               refreshDeck();

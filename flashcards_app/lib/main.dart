@@ -1,4 +1,4 @@
-import 'package:flashcards_app/decks_list.dart';
+import 'package:flashcards_app/screens/decks_list/decks_list.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MyApp());

@@ -1,5 +1,5 @@
-import 'package:flashcards_app/services/deck_detail/subdecks/add_subdeck.dart';
-import 'package:flashcards_app/services/deck_detail/subdecks/update_subdeck.dart';
+import 'package:flashcards_app/screens/deck_detail/components/subdecks/add_subdeck.dart';
+import 'package:flashcards_app/screens/deck_detail/components/subdecks/update_subdeck.dart';
 import 'package:flutter/material.dart';
 
 void showSubDeckForm(int? id, dynamic context, List subDecks, String deckName,

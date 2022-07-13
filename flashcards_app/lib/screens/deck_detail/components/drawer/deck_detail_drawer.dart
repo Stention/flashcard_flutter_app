@@ -1,7 +1,6 @@
-import 'package:flashcards_app/services/deck_detail/change_number_of_questions.dart';
-import 'package:flashcards_app/services/deck_detail/change_target_language.dart';
-import 'package:flashcards_app/services/deck_detail/generate_csv.dart';
-import 'package:flashcards_app/services/deck_detail/upload_csv.dart';
+import 'package:flashcards_app/screens/deck_detail/components/csv_manager.dart';
+import 'package:flashcards_app/screens/deck_detail/components/number_of_questions/change_number_of_questions.dart';
+import 'package:flashcards_app/screens/deck_detail/components/language/change_target_language.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -62,13 +61,13 @@ class _DeckDetailDrawerState extends State<DeckDetailDrawer> {
           ),
           decoration: BoxDecoration(color: Colors.black)),
       ListTile(
-        title: const Text('Upload Words file'),
-        onTap: () => uploadCsvFile(widget.deckName, context,
-            refreshDeck: widget.refreshDeck),
-      ),
+          title: const Text('Upload Words file'),
+          onTap: () => CsvManager().uploadCsvFile(widget.deckName, context,
+              refreshDeck: widget.refreshDeck)),
       ListTile(
         title: const Text('Download Words file'),
-        onTap: () => generateCsvFile(widget.deckName, widget.words, context),
+        onTap: () => CsvManager()
+            .generateCsvFile(widget.deckName, widget.words, context),
       ),
       const ListTile(
         title: Text('How many words you want to learn?'),

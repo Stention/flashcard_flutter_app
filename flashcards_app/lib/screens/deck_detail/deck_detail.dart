@@ -1,19 +1,19 @@
-import 'package:flashcards_app/decks_list.dart';
-import 'package:flashcards_app/services/deck_detail/set_indicator_color.dart';
-import 'package:flashcards_app/services/deck_detail/set_indicator_percent.dart';
-import 'package:flashcards_app/services/deck_detail/show_word_form.dart';
-import 'package:flashcards_app/services/deck_detail/show_subdeck_form.dart';
-import 'package:flashcards_app/services/deck_detail/speed_dial.dart';
-import 'package:flashcards_app/services/deck_detail/subdecks/delete_subdeck.dart';
-import 'package:flashcards_app/services/deck_detail/words/add_word_to_subdeck.dart';
-import 'package:flashcards_app/widgets/deck_detail_drawer.dart';
+import 'package:flashcards_app/screens/deck_detail/components/words_manager.dart';
+import 'package:flashcards_app/screens/decks_list/decks_list.dart';
+import 'package:flashcards_app/screens/deck_detail/components/level_indicator/set_indicator_color.dart';
+import 'package:flashcards_app/screens/deck_detail/components/level_indicator/set_indicator_percent.dart';
+import 'package:flashcards_app/screens/deck_detail/components/forms/show_word_form.dart';
+import 'package:flashcards_app/screens/deck_detail/components/forms/show_subdeck_form.dart';
+import 'package:flashcards_app/screens/deck_detail/components/forms/speed_dial.dart';
+import 'package:flashcards_app/screens/deck_detail/components/subdecks/delete_subdeck.dart';
+import 'package:flashcards_app/screens/deck_detail/components/drawer/deck_detail_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import "database_helper.dart";
-import 'quiz_find_the_word.dart';
-import 'quiz_find_translation.dart';
+import '../../database_helper.dart';
+import '../quiz/quiz_find_the_word.dart';
+import '../quiz/quiz_find_translation.dart';
 
 class DeckDetail extends StatefulWidget {
   const DeckDetail({Key? key, required this.deckId, required this.deckName})
@@ -302,7 +302,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                 );
                               }, onAccept: (data) {
                                 setState(() {
-                                  addWordToSubdeck(
+                                  WordsManager().addWordToSubdeck(
                                       data, _subDecks[index]['name'],
                                       refreshDeck: _refreshDeck);
                                 });
@@ -396,7 +396,7 @@ class _DeckDetailState extends State<DeckDetail> {
                           );
                         }, onAccept: (data) {
                           setState(() {
-                            addWordToSubdeck(data, null,
+                            WordsManager().addWordToSubdeck(data, null,
                                 refreshDeck: _refreshDeck);
                           });
                         }),
