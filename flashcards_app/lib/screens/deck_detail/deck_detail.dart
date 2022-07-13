@@ -1,12 +1,10 @@
+import 'package:flashcards_app/screens/deck_detail/components/deck_detail_manager.dart';
 import 'package:flashcards_app/screens/deck_detail/components/words_manager.dart';
 import 'package:flashcards_app/screens/decks_list/decks_list.dart';
-import 'package:flashcards_app/screens/deck_detail/components/level_indicator/set_indicator_color.dart';
-import 'package:flashcards_app/screens/deck_detail/components/level_indicator/set_indicator_percent.dart';
 import 'package:flashcards_app/screens/deck_detail/components/forms/show_word_form.dart';
 import 'package:flashcards_app/screens/deck_detail/components/forms/show_subdeck_form.dart';
 import 'package:flashcards_app/screens/deck_detail/components/forms/speed_dial.dart';
-import 'package:flashcards_app/screens/deck_detail/components/subdecks/delete_subdeck.dart';
-import 'package:flashcards_app/screens/deck_detail/components/drawer/deck_detail_drawer.dart';
+import 'package:flashcards_app/screens/deck_detail/components/forms/deck_detail_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -136,7 +134,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                         ),
                                         SlidableAction(
                                           onPressed: (context) {
-                                            deleteSubDeck(
+                                            DeckDetailManager().deleteSubDeck(
                                                 _subDecks[index]['id'], context,
                                                 refreshDeck: _refreshDeck);
                                           },
@@ -246,12 +244,14 @@ class _DeckDetailState extends State<DeckDetail> {
                                                         children: [
                                                           CircularPercentIndicator(
                                                             radius: 12.0,
-                                                            percent: setIndicatorPercent(
-                                                                _wordsWithoutSubdeck[
-                                                                        index]
-                                                                    ["level"]),
-                                                            progressColor:
-                                                                setIndicatorColour(
+                                                            percent: WordsManager()
+                                                                .setIndicatorPercent(
+                                                                    _wordsWithoutSubdeck[
+                                                                            index]
+                                                                        [
+                                                                        "level"]),
+                                                            progressColor: WordsManager()
+                                                                .setIndicatorColour(
                                                                     _wordsWithoutSubdeck[
                                                                             index]
                                                                         [
@@ -343,13 +343,13 @@ class _DeckDetailState extends State<DeckDetail> {
                                                     children: [
                                                       CircularPercentIndicator(
                                                         radius: 12.0,
-                                                        percent:
-                                                            setIndicatorPercent(
+                                                        percent: WordsManager()
+                                                            .setIndicatorPercent(
                                                                 _wordsWithoutSubdeck[
                                                                         index]
                                                                     ["level"]),
-                                                        progressColor:
-                                                            setIndicatorColour(
+                                                        progressColor: WordsManager()
+                                                            .setIndicatorColour(
                                                                 _wordsWithoutSubdeck[
                                                                         index]
                                                                     ["level"]),

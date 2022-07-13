@@ -1,6 +1,7 @@
 import 'package:flashcards_app/screens/deck_detail/components/csv_manager.dart';
-import 'package:flashcards_app/screens/deck_detail/components/number_of_questions/change_number_of_questions.dart';
-import 'package:flashcards_app/screens/deck_detail/components/language/change_target_language.dart';
+import 'package:flashcards_app/screens/deck_detail/components/deck_detail_manager.dart';
+//import 'package:flashcards_app/screens/deck_detail/components/number_of_questions/change_number_of_questions.dart';
+//import 'package:flashcards_app/screens/deck_detail/components/language/change_target_language.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
@@ -80,7 +81,8 @@ class _DeckDetailDrawerState extends State<DeckDetailDrawer> {
             style: ElevatedButton.styleFrom(
               primary: widget.numberOfQuestions == 10 ? Colors.purple : null,
             ),
-            onPressed: () => changeNumberOfQuestions(widget.deckId, 10,
+            onPressed: () => DeckDetailManager().changeNumberOfQuestions(
+                widget.deckId, 10,
                 refreshDeck: widget.refreshDeck),
           ),
           ElevatedButton(
@@ -88,7 +90,8 @@ class _DeckDetailDrawerState extends State<DeckDetailDrawer> {
             style: ElevatedButton.styleFrom(
               primary: widget.numberOfQuestions == 30 ? Colors.purple : null,
             ),
-            onPressed: () => changeNumberOfQuestions(widget.deckId, 30,
+            onPressed: () => DeckDetailManager().changeNumberOfQuestions(
+                widget.deckId, 30,
                 refreshDeck: widget.refreshDeck),
           ),
           ElevatedButton(
@@ -96,7 +99,8 @@ class _DeckDetailDrawerState extends State<DeckDetailDrawer> {
             style: ElevatedButton.styleFrom(
               primary: widget.numberOfQuestions == 50 ? Colors.purple : null,
             ),
-            onPressed: () => changeNumberOfQuestions(widget.deckId, 50,
+            onPressed: () => DeckDetailManager().changeNumberOfQuestions(
+                widget.deckId, 50,
                 refreshDeck: widget.refreshDeck),
           )
         ]),
@@ -117,7 +121,8 @@ class _DeckDetailDrawerState extends State<DeckDetailDrawer> {
                   );
                 }).toList(),
                 onChanged: (value) {
-                  changeTargetLanguage(widget.deckId, value.toString(),
+                  DeckDetailManager().changeTargetLanguage(
+                      widget.deckId, value.toString(),
                       refreshDeck: widget.refreshDeck);
                 },
               ),

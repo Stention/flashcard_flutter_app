@@ -1,5 +1,4 @@
-import 'package:flashcards_app/screens/deck_detail/components/subdecks/add_subdeck.dart';
-import 'package:flashcards_app/screens/deck_detail/components/subdecks/update_subdeck.dart';
+import 'package:flashcards_app/screens/deck_detail/components/deck_detail_manager.dart';
 import 'package:flutter/material.dart';
 
 void showSubDeckForm(int? id, dynamic context, List subDecks, String deckName,
@@ -45,11 +44,13 @@ void showSubDeckForm(int? id, dynamic context, List subDecks, String deckName,
                             MaterialStateProperty.all(Colors.black)),
                     onPressed: () async {
                       if (id == null) {
-                        await addSubdeck(_nameController.text, deckName);
+                        await DeckDetailManager()
+                            .addSubdeck(_nameController.text, deckName);
                         refreshDeck();
                       }
                       if (id != null) {
-                        await updateSubdeck(id, _nameController.text);
+                        await DeckDetailManager()
+                            .updateSubdeck(id, _nameController.text);
                         refreshDeck();
                       }
                       _nameController.text = '';
