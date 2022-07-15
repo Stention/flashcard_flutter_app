@@ -73,7 +73,7 @@ class _DeckDetailState extends State<DeckDetail> {
   @override
   Widget build(BuildContext context) {
     tts.setLanguage(_targetLanguage);
-    tts.setSpeechRate(0.5);
+    tts.setSpeechRate(0.4);
     return Scaffold(
         endDrawer: DeckDetailDrawer(
             deckId: widget.deckId,
@@ -153,7 +153,7 @@ class _DeckDetailState extends State<DeckDetail> {
                                     controlAffinity:
                                         ListTileControlAffinity.leading,
                                     trailing: SizedBox(
-                                      width: 100,
+                                      width: 150,
                                       child: Row(children: [
                                         IconButton(
                                             icon: const Icon(
@@ -208,6 +208,15 @@ class _DeckDetailState extends State<DeckDetail> {
                                                                     wordsInSubdeck,
                                                                 numberOfQuestions:
                                                                     _numberOfQuestions)));
+                                              }
+                                            }),
+                                        IconButton(
+                                            icon: const Icon(Icons.play_arrow),
+                                            onPressed: () {
+                                              for (var word
+                                                  in wordsInSubdeck!) {
+                                                tts.setSpeechRate(0.3);
+                                                tts.speak(word["word"]);
                                               }
                                             }),
                                       ]),

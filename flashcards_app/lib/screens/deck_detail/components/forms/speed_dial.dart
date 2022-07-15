@@ -5,10 +5,13 @@ import 'package:flashcards_app/screens/deck_detail/components/forms/show_subdeck
 import 'package:flashcards_app/screens/deck_detail/components/forms/show_word_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 SpeedDial buildSpeedDial(int deckId, String deckName, dynamic context,
     List subDecks, List words, int numberOfQuestions,
     {required refreshDeck}) {
+  final FlutterTts tts = FlutterTts();
+
   return SpeedDial(
     animatedIcon: AnimatedIcons.menu_close,
     animatedIconTheme: const IconThemeData(size: 28.0),
@@ -16,6 +19,20 @@ SpeedDial buildSpeedDial(int deckId, String deckName, dynamic context,
     visible: true,
     curve: Curves.bounceInOut,
     children: [
+      SpeedDialChild(
+        child: const Icon(Icons.play_arrow, color: Colors.white),
+        backgroundColor: Colors.green,
+        onTap: () {
+          for (var word in words) {
+            tts.setSpeechRate(0.3);
+            tts.speak(word["word"]);
+          }
+        },
+        label: 'Play the words',
+        labelStyle:
+            const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+        labelBackgroundColor: Colors.black,
+      ),
       SpeedDialChild(
         child: const Icon(Icons.search, color: Colors.white),
         backgroundColor: Colors.black,
