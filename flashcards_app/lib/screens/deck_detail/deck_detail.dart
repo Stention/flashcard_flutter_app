@@ -269,11 +269,15 @@ class _DeckDetailState extends State<DeckDetail> {
                                                           IconButton(
                                                               icon: const Icon(Icons
                                                                   .surround_sound),
-                                                              onPressed: () => tts.speak(
-                                                                  wordsInSubdeck[
-                                                                          index]
-                                                                      [
-                                                                      "word"])),
+                                                              onPressed: () {
+                                                                tts.setSpeechRate(
+                                                                    0.32);
+                                                                tts.speak(
+                                                                    wordsInSubdeck[
+                                                                            index]
+                                                                        [
+                                                                        "word"]);
+                                                              }),
                                                         ],
                                                       ),
                                                     ),
@@ -414,8 +418,24 @@ class _DeckDetailState extends State<DeckDetail> {
                   ),
                 ],
               ),
-        floatingActionButton: buildSpeedDial(widget.deckId, widget.deckName,
-            context, _subDecks, _words, _numberOfQuestions,
-            refreshDeck: _refreshDeck));
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              child: const Icon(Icons.play_arrow, color: Colors.white),
+              backgroundColor: Colors.green,
+              onPressed: () {
+                for (var word in _wordsWithoutSubdeck) {
+                  tts.setSpeechRate(0.32);
+                  tts.speak(word["word"]);
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            buildSpeedDial(widget.deckId, widget.deckName, context, _subDecks,
+                _wordsWithoutSubdeck, _numberOfQuestions,
+                refreshDeck: _refreshDeck)
+          ],
+        ));
   }
 }

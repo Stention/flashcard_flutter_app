@@ -26,7 +26,7 @@ class WordsManager {
   }
 
   dynamic setIndicatorColour(int level) {
-    if (level == 2) {
+    if (level == 0) {
       Color color = const Color(0x00000000);
       return color;
     } else if (level > 0 && level <= 2) {
@@ -38,10 +38,10 @@ class WordsManager {
     } else if (level > 5 && level <= 7) {
       Color color = Colors.yellow;
       return color;
-    } else if (level > 7 && level <= 10) {
+    } else if (level > 7 && level <= 9) {
       Color color = Colors.lightGreen;
       return color;
-    } else if (level > 7 && level <= 10) {
+    } else if (level > 9 && level <= 10) {
       Color color = Colors.green;
       return color;
     }
