@@ -40,7 +40,11 @@ class _HomePageState extends State<HomePage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
+          : GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1,
+              ),
               scrollDirection: Axis.vertical,
               itemCount: _decks.length,
               itemBuilder: (BuildContext context, int index) => Card(
