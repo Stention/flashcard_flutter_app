@@ -33,7 +33,6 @@ dependencies:
   path: ^1.8.0
   csv: ^5.0.1
   path_provider: ^2.0.9
-  file_picker: ^4.5.1
   flutter_slidable: ^1.2.0
 
   # The following adds the Cupertino Icons font to your application.
@@ -42,6 +41,7 @@ dependencies:
   flutter_speed_dial: ^5.0.0+1
   flutter_tts: ^3.3.3
   percent_indicator: ^4.0.0
+  file_picker: ^5.2.4
 
 dev_dependencies:
   flutter_test:

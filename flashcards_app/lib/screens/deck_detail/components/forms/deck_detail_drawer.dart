@@ -74,36 +74,40 @@ class _DeckDetailDrawerState extends State<DeckDetailDrawer> {
         title: Text('How many words you want to learn?'),
       ),
       ListTile(
-        title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <
-            Widget>[
-          ElevatedButton(
-            child: Text(widget.numberOfQuestions == 10 ? '10' : '10'),
-            style: ElevatedButton.styleFrom(
-              primary: widget.numberOfQuestions == 10 ? Colors.purple : null,
-            ),
-            onPressed: () => DeckDetailManager().changeNumberOfQuestions(
-                widget.deckId, 10,
-                refreshDeck: widget.refreshDeck),
-          ),
-          ElevatedButton(
-            child: Text(widget.numberOfQuestions == 30 ? '30' : '30'),
-            style: ElevatedButton.styleFrom(
-              primary: widget.numberOfQuestions == 30 ? Colors.purple : null,
-            ),
-            onPressed: () => DeckDetailManager().changeNumberOfQuestions(
-                widget.deckId, 30,
-                refreshDeck: widget.refreshDeck),
-          ),
-          ElevatedButton(
-            child: Text(widget.numberOfQuestions == 50 ? '50' : '50'),
-            style: ElevatedButton.styleFrom(
-              primary: widget.numberOfQuestions == 50 ? Colors.purple : null,
-            ),
-            onPressed: () => DeckDetailManager().changeNumberOfQuestions(
-                widget.deckId, 50,
-                refreshDeck: widget.refreshDeck),
-          )
-        ]),
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              ElevatedButton(
+                child: Text(widget.numberOfQuestions == 10 ? '10' : '10'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      widget.numberOfQuestions == 10 ? Colors.purple : null,
+                ),
+                onPressed: () => DeckDetailManager().changeNumberOfQuestions(
+                    widget.deckId, 10,
+                    refreshDeck: widget.refreshDeck),
+              ),
+              ElevatedButton(
+                child: Text(widget.numberOfQuestions == 30 ? '30' : '30'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      widget.numberOfQuestions == 30 ? Colors.purple : null,
+                ),
+                onPressed: () => DeckDetailManager().changeNumberOfQuestions(
+                    widget.deckId, 30,
+                    refreshDeck: widget.refreshDeck),
+              ),
+              ElevatedButton(
+                child: Text(widget.numberOfQuestions == 50 ? '50' : '50'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      widget.numberOfQuestions == 50 ? Colors.purple : null,
+                ),
+                onPressed: () => DeckDetailManager().changeNumberOfQuestions(
+                    widget.deckId, 50,
+                    refreshDeck: widget.refreshDeck),
+              )
+            ]),
       ),
       const ListTile(
         title: Text('Choose target language'),
